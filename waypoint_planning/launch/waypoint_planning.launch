@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="waypoint_planner" pkg="waypoint_planner" type="waypoint_planner"/>
+</launch>
