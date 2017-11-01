@@ -6,7 +6,7 @@ from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QPushButton, QListWidget, QLineEdit
 from python_qt_binding.QtCore import QRegExp
-from python_qt_binding.QtGui import QRegExpValidator
+from python_qt_binding.QtGui import QRegExpValidator, QFileDialog
 from parse import parse
 
 
@@ -78,6 +78,8 @@ class WaypointPlanner(Plugin):
         self.currentWaypoints = []
         self.currentWaypoint = None
         self.newWaypointList.itemClicked.connect(self.newWaypointSelected)
+        self.fileDialog = QFileDialog()
+        self.fileDialog.setFilter("Waypoint Files (*.wp)")
 
     def waypointFromString(self,text):
         (x,y,z,o,v) = parse("Waypoint X:{} Y:{} Z:{} {} @degrees, {}kph",text)
@@ -99,15 +101,25 @@ class WaypointPlanner(Plugin):
 
     def handleClearWaypoints(self):
         self.clearWaypointsButton.setText("You Cleared It!")
-        pass
+
 
     def handleLoadFile(self):
-
-        pass
+        self.fileDialog.setFileMode(QFileDialog.ExistingFile)
+        if self.fileDialog.exec_():
+            file_name = self.fileDialog.selectedFiles()
+            f = open(file_name[0],'r')
+            for line in f:
+                self.waypoints.append(self.waypointFromString(line))
+                self.newWaypointList.addItem(line)
 
     def handleSaveFile(self):
+        self.fileDialog.setFileMode(QFileDialog.AnyFile)
+        if self.fileDialog.exec_():
+            file_name = self.fileDialog.selectedFiles()
+            f = open(file_name[0],'w')
+            for waypoint in self.waypoints:
+                f.write(self.waypointToString(waypoint))
 
-        pass
 
     def handleAddWaypoint(self):
         text = self.locationLineEdit.text()
@@ -118,7 +130,7 @@ class WaypointPlanner(Plugin):
         waypoint = (location, orientation, velocity)
         self.createWaypoint(waypoint)
         self.currentWaypoint = waypoint
-        pass
+
 
     def handleDeleteWaypoint(self):
         if self.waypoints is None:
