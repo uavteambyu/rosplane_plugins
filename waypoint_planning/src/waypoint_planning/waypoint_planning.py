@@ -7,8 +7,9 @@ from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget, QPushButton, QListWidget, QLineEdit, QFileDialog
 from python_qt_binding.QtCore import QRegExp
 from python_qt_binding.QtGui import QRegExpValidator
+import json
 from parse import parse
-
+from rosplane_msgs import Waypoint
 
 
 class WaypointPlanner(Plugin):
@@ -80,6 +81,10 @@ class WaypointPlanner(Plugin):
         self.newWaypointList.itemClicked.connect(self.newWaypointSelected)
         self.fileDialog = QFileDialog()
         self.fileDialog.setFileMode(QFileDialog.AnyFile)
+        #Publisher/Subscriber
+        self.publisher = rospy.Publisher('waypoint_path',Waypoint,queue_size=20)
+        rospy.init_node('Waypoint Planner',anonymous=True)
+
 
     def waypointFromString(self,text):
         (x,y,z,o,v) = parse("Waypoint X:{} Y:{} Z:{} {} @degrees, {}kph",text)
@@ -100,22 +105,34 @@ class WaypointPlanner(Plugin):
         self.currentWaypoint = waypoint
 
     def handleClearWaypoints(self):
-        self.clearWaypointsButton.setText("You Cleared It!")
+        roswaypoint = Waypoint()
+        roswaypoint.w[0] = 0
+        roswaypoint.w[1] = 0
+        roswaypoint.w[2] = 0
+        roswaypoint.chi_d = 0
+        roswaypoint.chi_valid = False
+        roswaypoint.Va_d = 0
+        roswaypoint.clear_wp_list = True
+        roswaypoint.set_current = True
+        self.publisher.publish(roswaypoint)
 
 
     def handleLoadFile(self):
         file_name = self.fileDialog.getOpenFileName(self._widget,'Open File', '/home/',"Waypoint Files (*.wp)")
-        f = open(file_name[1],'r')
-        for line in f:
-            self.waypoints.append(self.waypointFromString(line))
-            self.newWaypointList.addItem(line)
+        print("OpenFileName:{}".format(file_name[0]))
+        f = open(file_name[0],'r')
+        data = f.read()
+        self.waypoints = json.loads(data)
         f.close()
+        for waypoint in self.waypoints:
+            self.newWaypointList.addItem(self.waypointToString(waypoint))
+
 
     def handleSaveFile(self):
         file_name = self.fileDialog.getSaveFileName(self._widget,'Save File', '/home/',"Waypoint Files (*.wp)")
-        f = open(file_name[1],'w')
-        for waypoint in self.waypoints:
-            f.write(self.waypointToString(waypoint))
+        print("SaveFileName:{}".format(file_name[0]))
+        f = open(file_name[0],'w')
+        f.write(json.dumps(self.waypoints))
         f.close()
 
 
@@ -140,8 +157,22 @@ class WaypointPlanner(Plugin):
 
 
     def handleSendWaypoints(self):
-
-        pass
+        first = True
+        for waypoint in self.waypoints:
+            (loc, orientation, velocity) = waypoint
+            (x, y, z) = loc
+            roswaypoint = Waypoint()
+            roswaypoint.w[0] = x
+            roswaypoint.w[1] = y
+            roswaypoint.w[2] = z
+            roswaypoint.chi_d = orientation
+            roswaypoint.chi_valid = False
+            roswaypoint.Va_d = velocity
+            roswaypoint.clear_wp_list = False
+            if first:
+                roswaypoint.set_current = True
+                first = False
+            self.publisher.publish(roswaypoint)
 
 
     def shutdown_plugin(self):
