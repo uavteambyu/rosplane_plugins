@@ -4,9 +4,9 @@ import rospkg
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
-from python_qt_binding.QtWidgets import QWidget, QPushButton, QListWidget, QLineEdit
+from python_qt_binding.QtWidgets import QWidget, QPushButton, QListWidget, QLineEdit, QFileDialog
 from python_qt_binding.QtCore import QRegExp
-from python_qt_binding.QtGui import QRegExpValidator, QFileDialog
+from python_qt_binding.QtGui import QRegExpValidator
 from parse import parse
 
 
@@ -79,7 +79,7 @@ class WaypointPlanner(Plugin):
         self.currentWaypoint = None
         self.newWaypointList.itemClicked.connect(self.newWaypointSelected)
         self.fileDialog = QFileDialog()
-        self.fileDialog.setFilter("Waypoint Files (*.wp)")
+        self.fileDialog.setFileMode(QFileDialog.AnyFile)
 
     def waypointFromString(self,text):
         (x,y,z,o,v) = parse("Waypoint X:{} Y:{} Z:{} {} @degrees, {}kph",text)
@@ -104,21 +104,19 @@ class WaypointPlanner(Plugin):
 
 
     def handleLoadFile(self):
-        self.fileDialog.setFileMode(QFileDialog.ExistingFile)
-        if self.fileDialog.exec_():
-            file_name = self.fileDialog.selectedFiles()
-            f = open(file_name[0],'r')
-            for line in f:
-                self.waypoints.append(self.waypointFromString(line))
-                self.newWaypointList.addItem(line)
+        file_name = self.fileDialog.getOpenFileName(self._widget,'Open File', '/home/',"Waypoint Files (*.wp)")
+        f = open(file_name[1],'r')
+        for line in f:
+            self.waypoints.append(self.waypointFromString(line))
+            self.newWaypointList.addItem(line)
+        f.close()
 
     def handleSaveFile(self):
-        self.fileDialog.setFileMode(QFileDialog.AnyFile)
-        if self.fileDialog.exec_():
-            file_name = self.fileDialog.selectedFiles()
-            f = open(file_name[0],'w')
-            for waypoint in self.waypoints:
-                f.write(self.waypointToString(waypoint))
+        file_name = self.fileDialog.getSaveFileName(self._widget,'Save File', '/home/',"Waypoint Files (*.wp)")
+        f = open(file_name[1],'w')
+        for waypoint in self.waypoints:
+            f.write(self.waypointToString(waypoint))
+        f.close()
 
 
     def handleAddWaypoint(self):
