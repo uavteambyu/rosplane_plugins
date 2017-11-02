@@ -8,8 +8,9 @@ from python_qt_binding.QtWidgets import QWidget, QPushButton, QListWidget, QLine
 from python_qt_binding.QtCore import QRegExp
 from python_qt_binding.QtGui import QRegExpValidator
 import json
-from parse import parse
-from rosplane_msgs import Waypoint
+from parse import parse,compile
+import csv
+from rosplane_msgs.msg import Waypoint
 
 
 class WaypointPlanner(Plugin):
@@ -63,15 +64,21 @@ class WaypointPlanner(Plugin):
         self.sendWaypointsButton.clicked.connect(self.handleSendWaypoints)
         #Text Edits
         self.locationLineEdit = self._widget.findChild(QLineEdit,"locationLineEdit")
-        regexp = QRegExp("\d+,\d+,\d+")
+        self.locationLineEdit.setText("50,50,-50")
+        regexp = QRegExp("\d+,\d+,-\d+")
         validator = QRegExpValidator(regexp)
         self.locationLineEdit.setValidator(validator)
         regexp1 = QRegExp("\d+")
         validator1 = QRegExpValidator(regexp1)
+        self.locationLineEdit.textChanged.connect(self.locationChanged)
         self.orientationLineEdit = self._widget.findChild(QLineEdit,"orientationLineEdit")
+        self.orientationLineEdit.setText("45")
         self.orientationLineEdit.setValidator(validator1)
+        self.orientationLineEdit.textChanged.connect(self.orientationChanged)
         self.velocityLineEdit = self._widget.findChild(QLineEdit,"velocityLineEdit")
+        self.velocityLineEdit.setText("16")
         self.velocityLineEdit.setValidator(validator1)
+        self.velocityLineEdit.textChanged.connect(self.velocityChanged)
         #Lists
         self.newWaypointList = self._widget.findChild(QListWidget,"newWaypointList")
         self.currentWaypointList = self._widget.findChild(QListWidget,"currentWaypointList")
@@ -83,35 +90,50 @@ class WaypointPlanner(Plugin):
         self.fileDialog.setFileMode(QFileDialog.AnyFile)
         #Publisher/Subscriber
         self.publisher = rospy.Publisher('waypoint_path',Waypoint,queue_size=20)
-        rospy.init_node('Waypoint Planner',anonymous=True)
+        self.subscriber = rospy.Subscriber('waypoint_path',Waypoint,self.publishedWaypointCallback)
 
+    def updateWaypoint(self):
+        self.newWaypointList.item(self.waypoints.index(self.currentWaypoint)).setText(self.waypointToString(self.currentWaypoint))
 
-    def waypointFromString(self,text):
-        (x,y,z,o,v) = parse("Waypoint X:{} Y:{} Z:{} {} @degrees, {}kph",text)
-        location = (x,y,z)
-        return (location,o,v)
+    def locationChanged(self,text):
+        try:
+            (x,y,z) = parse('{},{},{}',text)
+            if self.currentWaypoint is not None and x is not None and y is not None and z is not None and z is not "-":
+                self.currentWaypoint.w[0] = float(x)
+                self.currentWaypoint.w[1] = float(y)
+                self.currentWaypoint.w[2] = float(z)
+                self.updateWaypoint()
+        except:
+            print("Invalid location")
+
+    def orientationChanged(self,text):
+        if self.currentWaypoint is not None and text is not "":
+            self.currentWaypoint.chi_d = float(text)
+            self.updateWaypoint()
+
+    def velocityChanged(self,text):
+        if self.currentWaypoint is not None and text is not "":
+            self.currentWaypoint.Va_d = float(text)
+            self.updateWaypoint()
 
     def waypointToString(self,waypoint):
-        (location, orientation, velocity) = waypoint
-        (locx, locy, locz) = location
-        return "Waypoint X:{} Y:{} Z:{} @{}degrees, {}kph".format(locx,locy,locz,orientation,velocity)
+        return "Waypoint X:{} Y:{} Z:{} @{}degrees, {}kph".format(waypoint.w[0],waypoint.w[1],waypoint.w[2],waypoint.chi_d,waypoint.Va_d)
 
     def createWaypoint(self,waypoint):
         self.waypoints.append(waypoint)
         self.newWaypointList.addItem(self.waypointToString(waypoint))
 
     def newWaypointSelected(self,item):
-        waypoint = self.waypointFromString(item.text())
-        self.currentWaypoint = waypoint
+        self.currentWaypoint = self.waypoints[self.newWaypointList.currentRow()]
 
     def handleClearWaypoints(self):
         roswaypoint = Waypoint()
-        roswaypoint.w[0] = 0
-        roswaypoint.w[1] = 0
-        roswaypoint.w[2] = 0
-        roswaypoint.chi_d = 0
+        roswaypoint.w[0] = 0.0
+        roswaypoint.w[1] = 0.0
+        roswaypoint.w[2] = 0.0
+        roswaypoint.chi_d = 0.0
         roswaypoint.chi_valid = False
-        roswaypoint.Va_d = 0
+        roswaypoint.Va_d = 0.0
         roswaypoint.clear_wp_list = True
         roswaypoint.set_current = True
         self.publisher.publish(roswaypoint)
@@ -121,9 +143,19 @@ class WaypointPlanner(Plugin):
         file_name = self.fileDialog.getOpenFileName(self._widget,'Open File', '/home/',"Waypoint Files (*.wp)")
         print("OpenFileName:{}".format(file_name[0]))
         f = open(file_name[0],'r')
-        data = f.read()
-        self.waypoints = json.loads(data)
+        csvReader = csv.reader(f)
+        self.waypoints = []
+        for row in csvReader:
+            print(row)
+            waypoint = Waypoint()
+            waypoint.w[0] = float(row[0])
+            waypoint.w[1] = float(row[1])
+            waypoint.w[2] = float(row[2])
+            waypoint.chi_d = float(row[3])
+            waypoint.Va_d = float(row[4])
+            self.waypoints.append(waypoint)
         f.close()
+        self.newWaypointList.clear()
         for waypoint in self.waypoints:
             self.newWaypointList.addItem(self.waypointToString(waypoint))
 
@@ -132,7 +164,9 @@ class WaypointPlanner(Plugin):
         file_name = self.fileDialog.getSaveFileName(self._widget,'Save File', '/home/',"Waypoint Files (*.wp)")
         print("SaveFileName:{}".format(file_name[0]))
         f = open(file_name[0],'w')
-        f.write(json.dumps(self.waypoints))
+        csvWriter = csv.writer(f)
+        for waypoint in self.waypoints:
+            csvWriter.writerow([waypoint.w[0],waypoint.w[1],waypoint.w[2],waypoint.chi_d,waypoint.Va_d])
         f.close()
 
 
@@ -141,8 +175,15 @@ class WaypointPlanner(Plugin):
         (x,y,z) = parse('{},{},{}',text)
         orientation = self.orientationLineEdit.text()
         velocity = self.velocityLineEdit.text()
-        location = (x,y,z)
-        waypoint = (location, orientation, velocity)
+        waypoint = Waypoint()
+        waypoint.w[0] = float(x)
+        waypoint.w[1] = float(y)
+        waypoint.w[2] = float(z)
+        waypoint.chi_d = float(orientation)
+        waypoint.chi_valid = False
+        waypoint.Va_d = float(velocity)
+        waypoint.clear_wp_list = False
+        waypoint.set_current = False
         self.createWaypoint(waypoint)
         self.currentWaypoint = waypoint
 
@@ -156,23 +197,22 @@ class WaypointPlanner(Plugin):
             self.newWaypointList.addItem(self.waypointToString(waypoint))
 
 
+
+    def publishedWaypointCallback(self,waypoint):
+        if waypoint.clear_wp_list == True:
+            self.currentWaypoints = []
+            self.currentWaypointList.clear()
+        else:
+            self.currentWaypointList.addItem(self.waypointToString(waypoint))
+
+
     def handleSendWaypoints(self):
         first = True
         for waypoint in self.waypoints:
-            (loc, orientation, velocity) = waypoint
-            (x, y, z) = loc
-            roswaypoint = Waypoint()
-            roswaypoint.w[0] = x
-            roswaypoint.w[1] = y
-            roswaypoint.w[2] = z
-            roswaypoint.chi_d = orientation
-            roswaypoint.chi_valid = False
-            roswaypoint.Va_d = velocity
-            roswaypoint.clear_wp_list = False
             if first:
-                roswaypoint.set_current = True
+                waypoint.set_current = True
                 first = False
-            self.publisher.publish(roswaypoint)
+            self.publisher.publish(waypoint)
 
 
     def shutdown_plugin(self):
