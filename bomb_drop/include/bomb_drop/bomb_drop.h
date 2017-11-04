@@ -5,7 +5,7 @@
 #ifndef PROJECT_BOMB_DROP_H
 #define PROJECT_BOMB_DROP_H
 #include <ros/ros.h>
-#include <rosplane_plugins_msgs/WindEstimate.h>
+#include <rosplane_plugin_msgs/WindEstimate.h>
 #include <rosplane_msgs/Waypoint.h>
 namespace rosplane_plugins
 {
