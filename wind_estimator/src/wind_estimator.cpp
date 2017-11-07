@@ -3,17 +3,8 @@
 //
 #include "wind_estimator.h"
 
+#include <cstdlib>
+#include <math.h>
 
 
 
-
-
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "wind_estimator");
-    rosplane::wind_estimator *wind_est = new rosplane::wind_estimator_node();
-
-    ros::spin();
-
-    return 0;
-}
