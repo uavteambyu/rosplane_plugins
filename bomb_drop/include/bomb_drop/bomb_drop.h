@@ -41,6 +41,7 @@ namespace bomb_drop
         float timeStep;
         int currentIndex;
         bool windValid;
+        bool finishedComputation;
         float rho;
         float Cd;
         float S;

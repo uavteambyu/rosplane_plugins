@@ -21,25 +21,29 @@ namespace bomb_drop
         stateArray[0].velocity.n = initialVelocity;
         stateArray[0].velocity.e = 0;
         stateArray[0].velocity.d = 0;
-        computeDropLocation();
         this->timeStep = timeStep;
         this->mass = mass;
         this->S = S;
         this->Cd = Cd;
         this->rho = rho;
-        while (!windValid){
-
-        }
-        addInWind();
-        createWaypointPath();
-        publishWaypointPath();
+        finishedComputation = false;
+        ROS_INFO("Computing the Drop Location");
+        computeDropLocation();
+        finishedComputation = true;
+        ROS_INFO("Finished computing the Drop Location");
+        windEstimateSubscriber = nh_.subscribe("wind_estimate", 10, &bombDrop::windCallback,this);
+        waypointPublisher = nh_.advertise<rosplane_msgs::Waypoint>("waypoint_path",10);
+        ROS_INFO("The waypoint for the drop is: n(%f) e(%f) d(%f)",Zdrop.n,Zdrop.e,Zdrop.d);
     }
 
     void bombDrop::windCallback(const rosplane_plugin_msgs::WindEstimate &msg) {
-        if (msg.confidence > 0.9){
+        if (msg.confidence > 0.9 && windValid != true){
             windEstimate.wn = msg.wn;
             windEstimate.we = msg.we;
             windValid = true;
+            addInWind();
+            createWaypointPath();
+            publishWaypointPath();
         }
     }
 
@@ -75,7 +79,7 @@ namespace bomb_drop
     }
 
     void bombDrop::computeDropLocation(){
-        while (stateArray[currentIndex].location.d > 50){
+        while (stateArray[currentIndex].location.d < 50){
             currentIndex++;
             computeNextVStep();
             computeNextZStep();
@@ -93,9 +97,9 @@ namespace bomb_drop
 
     }
     void bombDrop::computeNextZStep(){
-        stateArray[currentIndex].location.n = stateArray[currentIndex-1].velocity.n*(timeStep) + stateArray[currentIndex].location.n;
-        stateArray[currentIndex].location.e = stateArray[currentIndex-1].velocity.e*(timeStep) + stateArray[currentIndex].location.e;
-        stateArray[currentIndex].location.d = stateArray[currentIndex-1].velocity.d*(timeStep) + stateArray[currentIndex].location.d;
+        stateArray[currentIndex].location.n = stateArray[currentIndex-1].velocity.n*(timeStep) + stateArray[currentIndex-1].location.n;
+        stateArray[currentIndex].location.e = stateArray[currentIndex-1].velocity.e*(timeStep) + stateArray[currentIndex-1].location.e;
+        stateArray[currentIndex].location.d = stateArray[currentIndex-1].velocity.d*(timeStep) + stateArray[currentIndex-1].location.d;
     }
 
     float bombDrop::magnitude(coordinate& coord){

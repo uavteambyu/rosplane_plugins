@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "bomb_drop_node"); // register the node on ROS
     ros::NodeHandle nh; // get a handle to ROS
     float timeStep = .001;
-    float Va = 14;
+    float Va = 1;
     float Cd = .5; //drag coefficient for a sphere
     float S = M_PI*pow(.01,2);
     float rho = .051;
