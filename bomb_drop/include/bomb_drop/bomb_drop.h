@@ -36,7 +36,7 @@ namespace bomb_drop
         void publishWaypointPath();
         void computeNextVStep();
         void computeNextZStep();
-	float windAngle;
+	    float windAngle;
         float magnitude(coordinate& coord);
         float timeStep;
         int currentIndex;

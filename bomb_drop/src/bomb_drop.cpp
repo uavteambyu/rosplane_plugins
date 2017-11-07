@@ -36,7 +36,7 @@ namespace bomb_drop
     }
 
     void bombDrop::windCallback(const rosplane_plugin_msgs::WindEstimate &msg) {
-        if (msg.confidence > 0){
+        if (msg.confidence > 0.9){
             windEstimate.wn = msg.wn;
             windEstimate.we = msg.we;
             windValid = true;
