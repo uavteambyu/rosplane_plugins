@@ -2,9 +2,16 @@
 // Created by tim on 11/2/17.
 //
 
-#ifndef PROJECT_WIND_ESTIMATOR_H
-#define PROJECT_WIND_ESTIMATOR_H
+#ifndef WIND_ESTIMATOR_H
+#define WIND_ESTIMATOR_H
 
+#include <ros/ros.h>
+#include <rosflight_msgs/Command.h>
+#include <rosplane_msgs/State.h>
 
+namespace wind_estimator
+{
 
-#endif //PROJECT_WIND_ESTIMATOR_H
+}
+
+#endif //WIND_ESTIMATOR_H
