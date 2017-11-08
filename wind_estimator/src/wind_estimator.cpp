@@ -67,19 +67,38 @@ namespace wind_estimator {
     }
     float windEstimator::calculateConfidence()// function to calculate "confidence"
     {
-        float RatioStdDevMeanWn = 0;
+        float RatioStdDevMeanWn = 0; //compares std deviation to a percentage of mean
         float RatioStdDevMeanWe = 0;
-        if(2*StdDeviation.wn/abs(Mean.wn)<=0.1 && 2*StdDeviation.we/abs(Mean.we)<=0.1)
+
+
+        if(Mean.wn==0)
         {
-            ROS_INFO(" //print out what percentage is within 10% of mean
-            return //whichever is less accurate of the two directions
+            ROS_INFO("Zero mean in north direction. Standard deviation is %f.", StdDeviation.wn);
+        }
+        else
+            float RatioStdDevMeanWn = (0.1*abs(Mean.wn))/StdDeviation.wn;
+        if(Mean.we==0)
+        {
+            ROS_INFO("Zero mean in east direction. Standard deviation is %f.", StdDeviation.we);
+        }
+        else
+            float RatioStdDevMeanWe = (0.1*abs(Mean.we))/StdDeviation.we;
+
+
+
+        if(RatioStdDevMeanWn>=1.29 && RatioStdDevMeanWe >= 1.29)
+        {
+
+            ROS_INFO("At least 90% of measurements are within 10% of the mean for both wind directions.");
+            return 0.9;
         } else
         {
-            ROS_INFO(" //print out that not x% is within 10% of mean
-            return //whichever is less accurate of the two directions
+            ROS_INFO("Less than 90% of the measurements are within 10% of the mean in one or both wind directions.");
+            return .5;
         }
     }
 }
 
 
 
+//Consider using map to create lookup table for standard normal distribution
