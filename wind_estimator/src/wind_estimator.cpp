@@ -1,24 +1,27 @@
 //
 // Created by tim on 11/2/17.
 //
-#include "wind_estimator.h"
+#include "wind_estimator/wind_estimator.h"
 
 #include <cstdlib>
 #include <math.h>
 
 namespace wind_estimator {
-    windEstimator::windEstimator(){
+    windEstimator::windEstimator():
+            nh_(ros::NodeHandle()),
+            nh_private_(ros::NodeHandle())
+    {
         ArrayIndex = 0;
         PresentSampleNumber = 0;
         ArrayFilled = false;
-        StdDeviation->we = 0;
-        StdDeviation->wn = 0;
-        Mean->we = 0;
-        Mean->wn = 0;
+        StdDeviation.we = 0;
+        StdDeviation.wn = 0;
+        Mean.we = 0;
+        Mean.wn = 0;
         WindEstimatePublisher = nh_.advertise<rosplane_plugin_msgs::WindEstimate>("wind_estimate",10);
-        StateSubscriber = nh_.subscribe("/fixedwing/state", 10, stateCallback);
+        StateSubscriber = nh_.subscribe("state", 10, &windEstimator::stateCallback, this);
     }
-    void windEstimator::stateCallback(const rosplane_msgs::planeState &msg){
+    void windEstimator::stateCallback(const rosplane_msgs::State &msg){
         WindSamples.wn[ArrayIndex] = msg.wn;
         WindSamples.we[ArrayIndex] = msg.we;
         ROS_INFO("Added wind data, n(%f) e(%f), to sample index %d. We have recorded %d samples.",
@@ -47,7 +50,7 @@ namespace wind_estimator {
         calculateStdDev();
         windEstimate.wn = Mean.wn;
         windEstimate.we = Mean.we;
-        WindEstimate.confidence = calculateConfidence();
+        windEstimate.confidence = calculateConfidence();
         WindEstimatePublisher.publish(windEstimate);
     }
     void windEstimator::calculateAverage()//function to calculate sample average
@@ -104,15 +107,15 @@ namespace wind_estimator {
         PercentageWe = 2*(phi(RatioStdDevMeanWe)-phi(0));
         PercentageWn = 2*(phi(RatioStdDevMeanWn)-phi(0));
 
-        ROS_INFO("%f% of measurements are within 10% of the mean for the north direction.", PercentageWn);
-        ROS_INFO("%f% of measurements are within 10% of the mean for the east direction.", PercentageWe);
+        ROS_INFO("%f percent of measurements are within 10 percent of the mean for the north direction.", PercentageWn);
+        ROS_INFO("%f% percent of measurements are within 10 percent of the mean for the east direction.", PercentageWe);
 
-        return min(PercentageWe, PercentageWn);
+        return std::min(PercentageWe, PercentageWn);
 
     }
 
 
-    float phi(float x)
+    float windEstimator::phi(float x)
     {//implementation is open domain from https://www.johndcook.com/blog/cpp_phi/
         // constants
         const double a1 =  0.254829592;

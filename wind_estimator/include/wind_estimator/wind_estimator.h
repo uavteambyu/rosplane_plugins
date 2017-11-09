@@ -14,7 +14,7 @@ namespace wind_estimator {
     public:
         windEstimator();
     private:
-        const uint8_t MaxSampleNumber = 50; //number of samples to be used for estimation
+        const static uint8_t MaxSampleNumber = 50; //number of samples to be used for estimation
         struct wind_array{
             float wn[MaxSampleNumber];
             float we[MaxSampleNumber];
@@ -25,7 +25,7 @@ namespace wind_estimator {
         };
         rosplane_plugin_msgs::WindEstimate windEstimate;
         ros::NodeHandle nh_; //public for subscribing, publishing, etc
-        ros::NodeHandle nhPrivate_; //private for pulling parameter values from the parameter server
+        ros::NodeHandle nh_private_; //private for pulling parameter values from the parameter server
         ros::Subscriber StateSubscriber;
         ros::Publisher WindEstimatePublisher;
         single_wind_sample StdDeviation; //holds std_deviation for each direction (treat as independent random variables)
@@ -35,7 +35,7 @@ namespace wind_estimator {
         wind_array WindSamples;
         bool ArrayFilled;
 
-        void stateCallback(const rosplane_msgs::planeState &msg);
+        void stateCallback(const rosplane_msgs::State &msg);
         void publishWindEstimate(); //publish wind
         void calculateAverage();//function to calculate sample average
         void calculateStdDev();//function to calculate std deviation

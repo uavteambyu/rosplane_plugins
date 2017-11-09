@@ -6,7 +6,9 @@
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "wind_estimator");
-    rosplane::wind_estimator *wind_est = new rosplane::wind_estimator;
+    ros::NodeHandle nh; // get a handle to ROS
+
+    wind_estimator::windEstimator Thing();
 
     ros::spin();
 
