@@ -9,8 +9,10 @@
 #include <rosplane_plugin_msgs/WindEstimate.h>
 #include <rosplane_msgs/State.h>
 
-namespace wind_estimator {
+namespace wind_estimator
+{
     class windEstimator {
+
     public:
         windEstimator();
     private:
@@ -24,10 +26,12 @@ namespace wind_estimator {
             float we;
         };
         rosplane_plugin_msgs::WindEstimate windEstimate;
+
         ros::NodeHandle nh_; //public for subscribing, publishing, etc
-        ros::NodeHandle nh_private_; //private for pulling parameter values from the parameter server
+        ros::NodeHandle nhPrivate_;  //private for pulling parameter values from the parameter server
         ros::Subscriber StateSubscriber;
         ros::Publisher WindEstimatePublisher;
+
         single_wind_sample StdDeviation; //holds std_deviation for each direction (treat as independent random variables)
         single_wind_sample Mean; //holds means value for each direction
         uint8_t ArrayIndex;

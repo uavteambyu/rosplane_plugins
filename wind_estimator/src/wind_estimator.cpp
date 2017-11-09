@@ -6,10 +6,12 @@
 #include <cstdlib>
 #include <math.h>
 
-namespace wind_estimator {
-    windEstimator::windEstimator():
-            nh_(ros::NodeHandle()),
-            nh_private_(ros::NodeHandle())
+namespace wind_estimator
+{
+
+
+    windEstimator::windEstimator() :
+          nh_(ros::NodeHandle()), nhPrivate_(ros::NodeHandle("~"))
     {
         ArrayIndex = 0;
         PresentSampleNumber = 0;
@@ -18,9 +20,10 @@ namespace wind_estimator {
         StdDeviation.wn = 0;
         Mean.we = 0;
         Mean.wn = 0;
-        WindEstimatePublisher = nh_.advertise<rosplane_plugin_msgs::WindEstimate>("wind_estimate",10);
         StateSubscriber = nh_.subscribe("state", 10, &windEstimator::stateCallback, this);
+        WindEstimatePublisher = nh_.advertise<rosplane_plugin_msgs::WindEstimate>("wind_estimate",10);
     }
+
     void windEstimator::stateCallback(const rosplane_msgs::State &msg){
         WindSamples.wn[ArrayIndex] = msg.wn;
         WindSamples.we[ArrayIndex] = msg.we;
@@ -53,6 +56,7 @@ namespace wind_estimator {
         windEstimate.confidence = calculateConfidence();
         WindEstimatePublisher.publish(windEstimate);
     }
+
     void windEstimator::calculateAverage()//function to calculate sample average
     {
         float WnAccumulated = 0;
@@ -70,6 +74,7 @@ namespace wind_estimator {
         Mean.we = WeAccumulated/PresentSampleNumber;
         ROS_INFO("Average wind value is: n(%f) e(%f)", Mean.wn, Mean.we);
     }
+
     void windEstimator::calculateStdDev()//function to calculate std deviation
     {
         windEstimator::calculateAverage();
@@ -83,6 +88,7 @@ namespace wind_estimator {
         StdDeviation.wn = sqrt((DifferenceSumWn/(PresentSampleNumber-1)));
         StdDeviation.we = sqrt((DifferenceSumWe/(PresentSampleNumber-1)));
     }
+
     float windEstimator::calculateConfidence()// function to calculate "confidence"
     {
         float RatioStdDevMeanWn = 0; //compares std deviation to a percentage of mean
@@ -93,22 +99,22 @@ namespace wind_estimator {
 
         if(Mean.wn==0)
         {
-            ROS_INFO("Zero mean in north direction. Standard deviation is %f.", StdDeviation.wn);
+            ROS_INFO("Zero mean in north direction. Standard deviation is (%f).", StdDeviation.wn);
         }
         else
-            float RatioStdDevMeanWn = (0.1*abs(Mean.wn))/StdDeviation.wn;
+            RatioStdDevMeanWn = (0.1*abs(Mean.wn))/StdDeviation.wn;
         if(Mean.we==0)
         {
-            ROS_INFO("Zero mean in east direction. Standard deviation is %f.", StdDeviation.we);
+            ROS_INFO("Zero mean in east direction. Standard deviation is (%f).", StdDeviation.we);
         }
         else
-            float RatioStdDevMeanWe = (0.1*abs(Mean.we))/StdDeviation.we;
+            RatioStdDevMeanWe = (0.1*abs(Mean.we))/StdDeviation.we;
 
         PercentageWe = 2*(phi(RatioStdDevMeanWe)-phi(0));
         PercentageWn = 2*(phi(RatioStdDevMeanWn)-phi(0));
 
-        ROS_INFO("%f percent of measurements are within 10 percent of the mean for the north direction.", PercentageWn);
-        ROS_INFO("%f% percent of measurements are within 10 percent of the mean for the east direction.", PercentageWe);
+        ROS_INFO("(%f) percent of measurements are within 10 percent of the mean for the north direction.", PercentageWn);
+        ROS_INFO("(%f) percent of measurements are within 10 percent of the mean for the east direction.", PercentageWe);
 
         return std::min(PercentageWe, PercentageWn);
 
