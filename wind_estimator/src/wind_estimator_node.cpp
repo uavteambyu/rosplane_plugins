@@ -1,7 +1,7 @@
 //
 // Created by tim on 11/2/17.
 //
-#include "wind_estimator.h"
+#include "wind_estimator/wind_estimator.h"
 
 int main(int argc, char **argv)
 {

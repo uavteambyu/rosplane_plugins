@@ -40,7 +40,7 @@ namespace wind_estimator {
         void calculateAverage();//function to calculate sample average
         void calculateStdDev();//function to calculate std deviation
         float calculateConfidence();// function to calculate confidence
-        //
+        float phi(float x); //function acting as lookup table for cumulative dist. function
     };
 }
 

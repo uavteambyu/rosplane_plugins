@@ -15,6 +15,8 @@ namespace wind_estimator {
         StdDeviation->wn = 0;
         Mean->we = 0;
         Mean->wn = 0;
+        WindEstimatePublisher = nh_.advertise<rosplane_plugin_msgs::WindEstimate>("wind_estimate",10);
+        StateSubscriber = nh_.subscribe("/fixedwing/state", 10, stateCallback);
     }
     void windEstimator::stateCallback(const rosplane_msgs::planeState &msg){
         WindSamples.wn[ArrayIndex] = msg.wn;
@@ -30,11 +32,24 @@ namespace wind_estimator {
             ArrayFilled = true;
             ROS_INFO("Sample array filled. New samples will overwrite old values beginning with the first measurement.");
         }
-        if(PresentSampleNumber < 50)
-            PresentSampleNumber = PresentSampleNumber+1;
-    }
-    void windEstimator::publishWindEstimate(); //publish wind
+        if(PresentSampleNumber < 50) {
+            PresentSampleNumber = PresentSampleNumber + 1;
+            ROS_INFO("Sample array not yet full.");
+        } else{
+            ROS_INFO("Sample array full. Publishing estimate based on 50 samples.");
+            publishWindEstimate();
 
+        }
+    }
+    void windEstimator::publishWindEstimate() //publish wind
+    {
+        calculateAverage();
+        calculateStdDev();
+        windEstimate.wn = Mean.wn;
+        windEstimate.we = Mean.we;
+        WindEstimate.confidence = calculateConfidence();
+        WindEstimatePublisher.publish(windEstimate);
+    }
     void windEstimator::calculateAverage()//function to calculate sample average
     {
         float WnAccumulated = 0;
@@ -69,6 +84,8 @@ namespace wind_estimator {
     {
         float RatioStdDevMeanWn = 0; //compares std deviation to a percentage of mean
         float RatioStdDevMeanWe = 0;
+        float PercentageWn = 0;
+        float PercentageWe = 0;
 
 
         if(Mean.wn==0)
@@ -84,21 +101,40 @@ namespace wind_estimator {
         else
             float RatioStdDevMeanWe = (0.1*abs(Mean.we))/StdDeviation.we;
 
+        PercentageWe = 2*(phi(RatioStdDevMeanWe)-phi(0));
+        PercentageWn = 2*(phi(RatioStdDevMeanWn)-phi(0));
+
+        ROS_INFO("%f% of measurements are within 10% of the mean for the north direction.", PercentageWn);
+        ROS_INFO("%f% of measurements are within 10% of the mean for the east direction.", PercentageWe);
+
+        return min(PercentageWe, PercentageWn);
+
+    }
 
 
-        if(RatioStdDevMeanWn>=1.29 && RatioStdDevMeanWe >= 1.29)
-        {
+    float phi(float x)
+    {//implementation is open domain from https://www.johndcook.com/blog/cpp_phi/
+        // constants
+        const double a1 =  0.254829592;
+        const double a2 = -0.284496736;
+        const double a3 =  1.421413741;
+        const double a4 = -1.453152027;
+        const double a5 =  1.061405429;
+        const double p  =  0.3275911;
 
-            ROS_INFO("At least 90% of measurements are within 10% of the mean for both wind directions.");
-            return 0.9;
-        } else
-        {
-            ROS_INFO("Less than 90% of the measurements are within 10% of the mean in one or both wind directions.");
-            return .5;
-        }
+        // Save the sign of x
+        int sign = 1;
+        if (x < 0)
+            sign = -1;
+        x = fabs(x)/sqrt(2.0);
+
+        // A&S formula 7.1.26
+        double t = 1.0/(1.0 + p*x);
+        double y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*exp(-x*x);
+
+        return 0.5*(1.0 + sign*y);
     }
 }
 
 
 
-//Consider using map to create lookup table for standard normal distribution
