@@ -105,9 +105,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES wind_estimator
-#  CATKIN_DEPENDS roscpp rosplane_msgs rospy sensor_msgs
+  CATKIN_DEPENDS roscpp rosplane_msgs rospy sensor_msgs rosplane_plugin_msgs
 #  DEPENDS system_lib
 )
 
