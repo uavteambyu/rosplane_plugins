@@ -193,8 +193,8 @@ class WaypointPlanner(Plugin):
 
 
     def handleDeleteWaypoint(self):
-        if not self.waypoints:
-            print("Can't remove, no more waypoints")
+        if not self.waypoints or self.currentWaypoint not in self.waypoints:
+            print("Can't remove, waypoint not selected or no more waypoints")
             return
         self.waypoints.remove(self.currentWaypoint)
         self.newWaypointList.clear()
