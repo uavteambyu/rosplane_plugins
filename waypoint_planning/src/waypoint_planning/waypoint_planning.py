@@ -8,6 +8,7 @@ from python_qt_binding.QtWidgets import QWidget, QPushButton, QListWidget, QLine
 from python_qt_binding.QtCore import QRegExp
 from python_qt_binding.QtGui import QRegExpValidator
 import json
+import os
 from parse import parse,compile
 import csv
 from rosplane_msgs.msg import Waypoint
@@ -169,6 +170,9 @@ class WaypointPlanner(Plugin):
     def handleSaveFile(self):
         file_name = self.fileDialog.getSaveFileName(self._widget,'Save File', '/home/',"Waypoint Files (*.wp)")
         if not file_name[0]:
+            return
+        if not os.access (file_name[0], os.W_OK):
+            print("Permission to write denied at file path")
             return
         print("SaveFileName:{}".format(file_name[0]))
         f = open(file_name[0],'w')
