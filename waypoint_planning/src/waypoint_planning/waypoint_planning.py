@@ -107,9 +107,13 @@ class WaypointPlanner(Plugin):
             print("Invalid location")
 
     def orientationChanged(self,text):
-        if self.currentWaypoint is not None and text is not "":
-            self.currentWaypoint.chi_d = float(text)
-            self.updateWaypoint()
+        if self.currentWaypoint is not None and text is not None and text is not "":
+            try:
+                self.currentWaypoint.chi_d = float(text)
+                self.updateWaypoint()
+            except:
+                print("invalid orientation string")
+
 
     def velocityChanged(self,text):
         if self.currentWaypoint is not None and text is not "":
@@ -189,8 +193,9 @@ class WaypointPlanner(Plugin):
 
 
     def handleDeleteWaypoint(self):
-        if self.waypoints is None:
+        if not self.waypoints:
             print("Can't remove, no more waypoints")
+            return
         self.waypoints.remove(self.currentWaypoint)
         self.newWaypointList.clear()
         for waypoint in self.waypoints:
