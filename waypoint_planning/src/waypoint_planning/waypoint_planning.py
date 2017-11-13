@@ -171,11 +171,12 @@ class WaypointPlanner(Plugin):
         file_name = self.fileDialog.getSaveFileName(self._widget,'Save File', '/home/',"Waypoint Files (*.wp)")
         if not file_name[0]:
             return
-        if not os.access (file_name[0], os.W_OK):
-            print("Permission to write denied at file path")
-            return
         print("SaveFileName:{}".format(file_name[0]))
-        f = open(file_name[0],'w')
+        try:
+            f = open(file_name[0],'w')
+        except:
+            print("Could not save file. Permissions may have been denied")
+            return
         csvWriter = csv.writer(f)
         for waypoint in self.waypoints:
             csvWriter.writerow([waypoint.w[0],waypoint.w[1],waypoint.w[2],waypoint.chi_d,waypoint.Va_d])
