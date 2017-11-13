@@ -145,6 +145,8 @@ class WaypointPlanner(Plugin):
 
     def handleLoadFile(self):
         file_name = self.fileDialog.getOpenFileName(self._widget,'Open File', '/home/',"Waypoint Files (*.wp)")
+        if not file_name[0]:
+            return
         print("OpenFileName:{}".format(file_name[0]))
         f = open(file_name[0],'r')
         csvReader = csv.reader(f)
@@ -166,6 +168,8 @@ class WaypointPlanner(Plugin):
 
     def handleSaveFile(self):
         file_name = self.fileDialog.getSaveFileName(self._widget,'Save File', '/home/',"Waypoint Files (*.wp)")
+        if not file_name[0]:
+            return
         print("SaveFileName:{}".format(file_name[0]))
         f = open(file_name[0],'w')
         csvWriter = csv.writer(f)
