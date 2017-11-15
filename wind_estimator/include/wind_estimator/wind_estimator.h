@@ -17,7 +17,7 @@ namespace wind_estimator
         windEstimator();
     private:
         const static uint8_t MaxSampleNumber = 15; //number of samples to be used for estimation
-        const static float PercentNearMean = 0.5; // how close x% of the samples should be to the mean
+        const static float PercentNearMean = 2.5; // how close x% of the samples should be to the mean
         struct wind_array{
             float wn[MaxSampleNumber];
             float we[MaxSampleNumber];

@@ -1,6 +1,7 @@
 import os
 import rospy
 import rospkg
+import math
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
@@ -12,6 +13,7 @@ import os
 from parse import parse,compile
 import csv
 from rosplane_msgs.msg import Waypoint
+
 
 
 class WaypointPlanner(Plugin):
@@ -110,7 +112,8 @@ class WaypointPlanner(Plugin):
     def orientationChanged(self,text):
         if self.currentWaypoint is not None and text is not None and text is not "":
             try:
-                self.currentWaypoint.chi_d = float(text)
+                temp = float(text)*2*math.pi/360 #convert to radians
+                self.currentWaypoint.chi_d = temp
                 self.updateWaypoint()
             except:
                 print("invalid orientation string")
@@ -122,7 +125,7 @@ class WaypointPlanner(Plugin):
             self.updateWaypoint()
 
     def waypointToString(self,waypoint):
-        return "Waypoint X:{} Y:{} Z:{} @{}degrees, {}kph".format(waypoint.w[0],waypoint.w[1],waypoint.w[2],waypoint.chi_d,waypoint.Va_d)
+        return "Waypoint X:{} Y:{} Z:{} @{}degrees, {}kph".format(waypoint.w[0],waypoint.w[1],waypoint.w[2],waypoint.chi_d*180/math.pi,waypoint.Va_d)
 
     def createWaypoint(self,waypoint):
         self.waypoints.append(waypoint)
@@ -158,7 +161,8 @@ class WaypointPlanner(Plugin):
             waypoint.w[0] = float(row[0])
             waypoint.w[1] = float(row[1])
             waypoint.w[2] = float(row[2])
-            waypoint.chi_d = float(row[3])
+            temp = float(row[3])*2*math.pi/360
+            waypoint.chi_d = temp
             waypoint.Va_d = float(row[4])
             self.waypoints.append(waypoint)
         f.close()
@@ -179,7 +183,7 @@ class WaypointPlanner(Plugin):
             return
         csvWriter = csv.writer(f)
         for waypoint in self.waypoints:
-            csvWriter.writerow([waypoint.w[0],waypoint.w[1],waypoint.w[2],waypoint.chi_d,waypoint.Va_d])
+            csvWriter.writerow([waypoint.w[0],waypoint.w[1],waypoint.w[2],waypoint.chi_d*180/math.pi,waypoint.Va_d])
         f.close()
 
 
@@ -192,7 +196,8 @@ class WaypointPlanner(Plugin):
         waypoint.w[0] = float(x)
         waypoint.w[1] = float(y)
         waypoint.w[2] = float(z)
-        waypoint.chi_d = float(orientation)
+        temp = float(orientation)*2*math.pi/360
+        waypoint.chi_d = temp
         waypoint.chi_valid = False
         waypoint.Va_d = float(velocity)
         waypoint.clear_wp_list = False
