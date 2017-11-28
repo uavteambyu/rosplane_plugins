@@ -9,12 +9,15 @@
 #include <rosplane_plugin_msgs/WindEstimate.h>
 #include <rosplane_msgs/State.h>
 
-namespace wind_estimator {
+namespace wind_estimator
+{
     class windEstimator {
+
     public:
         windEstimator();
     private:
-        const static uint8_t MaxSampleNumber = 50; //number of samples to be used for estimation
+        const static uint8_t MaxSampleNumber = 15; //number of samples to be used for estimation
+        const static float PercentNearMean = 2.5; // how close x% of the samples should be to the mean
         struct wind_array{
             float wn[MaxSampleNumber];
             float we[MaxSampleNumber];
@@ -24,10 +27,12 @@ namespace wind_estimator {
             float we;
         };
         rosplane_plugin_msgs::WindEstimate windEstimate;
+
         ros::NodeHandle nh_; //public for subscribing, publishing, etc
         ros::NodeHandle nhPrivate_;  //private for pulling parameter values from the parameter server
-        ros::Subscriber StateSubscriber;
-        ros::Publisher WindEstimatePublisher;
+        ros::Subscriber stateSubscriber;
+        ros::Publisher windEstimatePublisher;
+
         single_wind_sample StdDeviation; //holds std_deviation for each direction (treat as independent random variables)
         single_wind_sample Mean; //holds means value for each direction
         uint8_t ArrayIndex;

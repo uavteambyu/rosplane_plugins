@@ -1,6 +1,7 @@
 import os
 import rospy
 import rospkg
+import math
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
@@ -8,9 +9,11 @@ from python_qt_binding.QtWidgets import QWidget, QPushButton, QListWidget, QLine
 from python_qt_binding.QtCore import QRegExp
 from python_qt_binding.QtGui import QRegExpValidator
 import json
+import os
 from parse import parse,compile
 import csv
 from rosplane_msgs.msg import Waypoint
+
 
 
 class WaypointPlanner(Plugin):
@@ -107,9 +110,14 @@ class WaypointPlanner(Plugin):
             print("Invalid location")
 
     def orientationChanged(self,text):
-        if self.currentWaypoint is not None and text is not "":
-            self.currentWaypoint.chi_d = float(text)
-            self.updateWaypoint()
+        if self.currentWaypoint is not None and text is not None and text is not "":
+            try:
+                temp = float(text)*2*math.pi/360 #convert to radians
+                self.currentWaypoint.chi_d = temp
+                self.updateWaypoint()
+            except:
+                print("invalid orientation string")
+
 
     def velocityChanged(self,text):
         if self.currentWaypoint is not None and text is not "":
@@ -117,7 +125,7 @@ class WaypointPlanner(Plugin):
             self.updateWaypoint()
 
     def waypointToString(self,waypoint):
-        return "Waypoint X:{} Y:{} Z:{} @{}degrees, {}kph".format(waypoint.w[0],waypoint.w[1],waypoint.w[2],waypoint.chi_d,waypoint.Va_d)
+        return "Waypoint X:{} Y:{} Z:{} @{}degrees, {}kph".format(waypoint.w[0],waypoint.w[1],waypoint.w[2],waypoint.chi_d*180/math.pi,waypoint.Va_d)
 
     def createWaypoint(self,waypoint):
         self.waypoints.append(waypoint)
@@ -141,6 +149,8 @@ class WaypointPlanner(Plugin):
 
     def handleLoadFile(self):
         file_name = self.fileDialog.getOpenFileName(self._widget,'Open File', '/home/',"Waypoint Files (*.wp)")
+        if not file_name[0]:
+            return
         print("OpenFileName:{}".format(file_name[0]))
         f = open(file_name[0],'r')
         csvReader = csv.reader(f)
@@ -151,7 +161,8 @@ class WaypointPlanner(Plugin):
             waypoint.w[0] = float(row[0])
             waypoint.w[1] = float(row[1])
             waypoint.w[2] = float(row[2])
-            waypoint.chi_d = float(row[3])
+            temp = float(row[3])*2*math.pi/360
+            waypoint.chi_d = temp
             waypoint.Va_d = float(row[4])
             self.waypoints.append(waypoint)
         f.close()
@@ -162,11 +173,17 @@ class WaypointPlanner(Plugin):
 
     def handleSaveFile(self):
         file_name = self.fileDialog.getSaveFileName(self._widget,'Save File', '/home/',"Waypoint Files (*.wp)")
+        if not file_name[0]:
+            return
         print("SaveFileName:{}".format(file_name[0]))
-        f = open(file_name[0],'w')
+        try:
+            f = open(file_name[0],'w')
+        except:
+            print("Could not save file. Permissions may have been denied")
+            return
         csvWriter = csv.writer(f)
         for waypoint in self.waypoints:
-            csvWriter.writerow([waypoint.w[0],waypoint.w[1],waypoint.w[2],waypoint.chi_d,waypoint.Va_d])
+            csvWriter.writerow([waypoint.w[0],waypoint.w[1],waypoint.w[2],waypoint.chi_d*180/math.pi,waypoint.Va_d])
         f.close()
 
 
@@ -179,7 +196,8 @@ class WaypointPlanner(Plugin):
         waypoint.w[0] = float(x)
         waypoint.w[1] = float(y)
         waypoint.w[2] = float(z)
-        waypoint.chi_d = float(orientation)
+        temp = float(orientation)*2*math.pi/360
+        waypoint.chi_d = temp
         waypoint.chi_valid = False
         waypoint.Va_d = float(velocity)
         waypoint.clear_wp_list = False
@@ -189,8 +207,9 @@ class WaypointPlanner(Plugin):
 
 
     def handleDeleteWaypoint(self):
-        if self.waypoints is None:
-            print("Can't remove, no more waypoints")
+        if not self.waypoints or self.currentWaypoint not in self.waypoints:
+            print("Can't remove, waypoint not selected or no more waypoints")
+            return
         self.waypoints.remove(self.currentWaypoint)
         self.newWaypointList.clear()
         for waypoint in self.waypoints:
