@@ -8,8 +8,7 @@
 
 namespace wind_estimator {
     windEstimator::windEstimator():
-            nh_(ros::NodeHandle()),
-            nh_private_(ros::NodeHandle())
+           nh_(ros::NodeHandle()), nhPrivate_(ros::NodeHandle("~"))
     {
         ArrayIndex = 0;
         PresentSampleNumber = 0;
@@ -20,6 +19,7 @@ namespace wind_estimator {
         Mean.wn = 0;
         WindEstimatePublisher = nh_.advertise<rosplane_plugin_msgs::WindEstimate>("wind_estimate",10);
         StateSubscriber = nh_.subscribe("state", 10, &windEstimator::stateCallback, this);
+
     }
     void windEstimator::stateCallback(const rosplane_msgs::State &msg){
         WindSamples.wn[ArrayIndex] = msg.wn;
