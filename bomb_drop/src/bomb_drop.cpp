@@ -39,7 +39,7 @@ namespace bomb_drop
         waypointPublisher = nh_.advertise<rosplane_msgs::Waypoint>("fixedwing/waypoint_path",10);
         ROS_INFO("The waypoint for the drop is: n(%f) e(%f) d(%f)",Zdrop.n,Zdrop.e,Zdrop.d);
         stateSubscriber = nh_.subscribe("fixedwing/state", 10, &bombDrop::stateCallback, this);;
-        commandPublisher = nh_.advertise<rosflight_msgs::Command>("command",10);
+        commandPublisher = nh_.advertise<rosflight_msgs::Command>("fixedwing/bomb_command",10);
     }
 
     void bombDrop::stateCallback(const rosplane_msgs::State &msg) {
