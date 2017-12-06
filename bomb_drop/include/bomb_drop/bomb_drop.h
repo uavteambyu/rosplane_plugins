@@ -8,6 +8,7 @@
 #include <rosplane_plugin_msgs/WindEstimate.h>
 #include <rosplane_msgs/Waypoint.h>
 #include <rosplane_msgs/State.h>
+#include <rosflight_msgs/Command.h>
 
 namespace bomb_drop
 {
@@ -41,6 +42,7 @@ namespace bomb_drop
         void publishWaypointPath();
         void computeNextVStep();
         void computeNextZStep();
+        bool inRange(float distCurr, float distDes, int maxDiff);
 	    float windAngle;
         float magnitude(coordinate& coord);
         float timeStep;
@@ -55,6 +57,9 @@ namespace bomb_drop
         coordinate Ptarget;
         coordinate Zdrop;
         float Tdrop;
+        coordinate stateCoord;
+        float stateAirspeed;
+        float stateCourseAngle;
         rosplane_plugin_msgs::WindEstimate windEstimate;
         rosplane_msgs::Waypoint path[10];
         locationVelocity stateArray[5000];

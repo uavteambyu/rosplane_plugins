@@ -21,6 +21,9 @@ namespace bomb_drop
         stateArray[0].velocity.n = initialVelocity;
         stateArray[0].velocity.e = 0;
         stateArray[0].velocity.d = 0;
+        Ptarget.n = 0;
+        Ptarget.e = 0;
+        Ptarget.d = 0;
         this->timeStep = timeStep;
         this->mass = mass;
         this->S = S;
@@ -35,11 +38,29 @@ namespace bomb_drop
         waypointPublisher = nh_.advertise<rosplane_msgs::Waypoint>("waypoint_path",10);
         ROS_INFO("The waypoint for the drop is: n(%f) e(%f) d(%f)",Zdrop.n,Zdrop.e,Zdrop.d);
         stateSubscriber = nh_.subscribe("fixedwing/state", 10, &bombDrop::stateCallback, this);;
-        commandPublisher;
+        commandPublisher = nh_.advertise<rosflight_msgs::Command>("command",10);
     }
 
     void bombDrop::stateCallback(const rosplane_msgs::State &msg) {
-
+        stateCoord.n = msg.position[0];
+        stateCoord.e = msg.position[1];
+        stateCoord.d = msg.position[2];
+        stateAirspeed = msg.Va;
+        stateCourseAngle = msg.chi;
+        if(inRange(stateAirspeed, stateArray[currentIndex].velocity.n, 1) &&
+                inRange(stateCoord.n, Pdrop.n, 5) &&
+                inRange(stateCoord.e, Pdrop.e, 5) &&
+                inRange(stateCoord.d, Pdrop.d, 5) &&
+                inRange(stateCourseAngle, windAngle, (10*M_PI/180))) {
+            // drop the bomb
+            rosflight_msgs::Command dropDaBomb;
+            dropDaBomb.ignore = rosflight_msgs::Command::IGNORE_X |
+                    rosflight_msgs::Command::IGNORE_Y | rosflight_msgs::Command::IGNORE_Z |
+                    rosflight_msgs::Command::IGNORE_F;
+            dropDaBomb.mode = rosflight_msgs::Command::MODE_PASS_THROUGH;
+            dropDaBomb.bomb_drop = 1;
+            commandPublisher.publish(dropDaBomb);
+        }
     }
 
     void bombDrop::windCallback(const rosplane_plugin_msgs::WindEstimate &msg) {
@@ -113,6 +134,9 @@ namespace bomb_drop
         return (sqrt(pow(coord.n,2)+pow(coord.e,2)+pow(coord.d,2)));
     }
 
+    bool bombDrop::inRange(float distCurr, float distDes, int maxDiff){
+        return (abs(distCurr-distDes) <= maxDiff);
+    }
 
 
 };
