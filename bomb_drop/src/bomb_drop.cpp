@@ -21,6 +21,7 @@ namespace bomb_drop
         stateArray[0].velocity.n = initialVelocity;
         stateArray[0].velocity.e = 0;
         stateArray[0].velocity.d = 0;
+        windValid = false;
         this->timeStep = timeStep;
         this->mass = mass;
         this->S = S;
@@ -32,7 +33,7 @@ namespace bomb_drop
         finishedComputation = true;
         ROS_INFO("Finished computing the Drop Location");
         windEstimateSubscriber = nh_.subscribe("wind_estimate", 10, &bombDrop::windCallback,this);
-        waypointPublisher = nh_.advertise<rosplane_msgs::Waypoint>("waypoint_path",10);
+        waypointPublisher = nh_.advertise<rosplane_msgs::Waypoint>("fixedwing/waypoint_path",10);
         ROS_INFO("The waypoint for the drop is: n(%f) e(%f) d(%f)",Zdrop.n,Zdrop.e,Zdrop.d);
         stateSubscriber = nh_.subscribe("fixedwing/state", 10, &bombDrop::stateCallback, this);;
         commandPublisher;
@@ -65,23 +66,29 @@ namespace bomb_drop
         path[0].w[0] = Pdrop.n;
         path[0].w[1] = Pdrop.e;
         path[0].w[2] = Pdrop.d;
-        path[1] = createWaypoint(true);
-        path[1].w[0] = Pdrop.n - cos(windAngle)*Zdrop.n + sin(windAngle)*Zdrop.e;
-        path[1].w[1] = Pdrop.e - sin(windAngle)*Zdrop.n - cos(windAngle)*Zdrop.e;
+        path[1] = createWaypoint(false);
+        path[1].w[0] = Pdrop.n - 5*cos(windAngle)*Zdrop.n + 5*sin(windAngle)*Zdrop.e;
+        path[1].w[1] = Pdrop.e - 5*sin(windAngle)*Zdrop.n - 5*cos(windAngle)*Zdrop.e;
         path[1].w[2] = Pdrop.d;
+        path[2] = createWaypoint(true);
+        path[2].w[0] = Pdrop.n - 10*cos(windAngle)*Zdrop.n + 10*sin(windAngle)*Zdrop.e;
+        path[2].w[1] = Pdrop.e - 10*sin(windAngle)*Zdrop.n - 10*cos(windAngle)*Zdrop.e;
+        path[2].w[2] = Pdrop.d;
+        path[3] = createWaypoint(true);
+        path[3].clear_wp_list = true;
     }
 
     rosplane_msgs::Waypoint bombDrop::createWaypoint(bool current){
         rosplane_msgs::Waypoint waypoint;
         waypoint.Va_d = stateArray[0].velocity.n;
         waypoint.chi_valid = false;
-        waypoint.chi_d = windAngle*180/M_PI;
+        waypoint.chi_d = windAngle;
         waypoint.set_current = current;
         waypoint.clear_wp_list = false;
     }
 
     void bombDrop::publishWaypointPath(){
-        for(int i = 0; i < 2; ++i){
+        for(int i = 3; i >=0; i--){
             waypointPublisher.publish(path[i]);
         }
     }
