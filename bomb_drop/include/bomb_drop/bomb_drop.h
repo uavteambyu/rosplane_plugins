@@ -7,6 +7,8 @@
 #include <ros/ros.h>
 #include <rosplane_plugin_msgs/WindEstimate.h>
 #include <rosplane_msgs/Waypoint.h>
+#include <rosplane_msgs/State.h>
+
 namespace bomb_drop
 {
     class bombDrop{
@@ -27,7 +29,10 @@ namespace bomb_drop
         ros::NodeHandle nhPrivate_; //private for pulling parameter values from the parameter server
         ros::Subscriber windEstimateSubscriber;
         ros::Publisher waypointPublisher;
+        ros::Subscriber stateSubscriber;
+        ros::Publisher commandPublisher;
 
+        void stateCallback(const rosplane_msgs::State &msg);
         void windCallback(const rosplane_plugin_msgs::WindEstimate &msg);
         void computeDropLocation();
         void addInWind();

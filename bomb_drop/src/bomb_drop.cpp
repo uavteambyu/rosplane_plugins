@@ -34,6 +34,12 @@ namespace bomb_drop
         windEstimateSubscriber = nh_.subscribe("wind_estimate", 10, &bombDrop::windCallback,this);
         waypointPublisher = nh_.advertise<rosplane_msgs::Waypoint>("waypoint_path",10);
         ROS_INFO("The waypoint for the drop is: n(%f) e(%f) d(%f)",Zdrop.n,Zdrop.e,Zdrop.d);
+        stateSubscriber = nh_.subscribe("fixedwing/state", 10, &bombDrop::stateCallback, this);;
+        commandPublisher;
+    }
+
+    void bombDrop::stateCallback(const rosplane_msgs::State &msg) {
+
     }
 
     void bombDrop::windCallback(const rosplane_plugin_msgs::WindEstimate &msg) {
@@ -75,7 +81,9 @@ namespace bomb_drop
     }
 
     void bombDrop::publishWaypointPath(){
-
+        for(int i = 0; i < 2; ++i){
+            waypointPublisher.publish(path[i]);
+        }
     }
 
     void bombDrop::computeDropLocation(){
@@ -86,7 +94,6 @@ namespace bomb_drop
         }
         Tdrop = currentIndex*timeStep;
         Zdrop = stateArray[currentIndex].location;
-        addInWind();
         //Vdrop.n = stateArray[0].velocity.n*
 
     }
