@@ -55,7 +55,7 @@ namespace wind_estimator
         windEstimate.wn = Mean.wn;
         windEstimate.we = Mean.we;
         windEstimate.confidence = calculateConfidence();
-        windEstimatePublisher.publish(windEstimate);
+        WindEstimatePublisher.publish(windEstimate);
     }
 
     void windEstimator::calculateAverage()//function to calculate sample average
