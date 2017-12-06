@@ -91,11 +91,14 @@ namespace bomb_drop
         path[1].w[0] = Pdrop.n - 5*cos(windAngle)*Zdrop.n + 5*sin(windAngle)*Zdrop.e;
         path[1].w[1] = Pdrop.e - 5*sin(windAngle)*Zdrop.n - 5*cos(windAngle)*Zdrop.e;
         path[1].w[2] = Pdrop.d;
-        path[2] = createWaypoint(true);
+        path[2] = createWaypoint(false);
         path[2].w[0] = Pdrop.n - 10*cos(windAngle)*Zdrop.n + 10*sin(windAngle)*Zdrop.e;
         path[2].w[1] = Pdrop.e - 10*sin(windAngle)*Zdrop.n - 10*cos(windAngle)*Zdrop.e;
         path[2].w[2] = Pdrop.d;
         path[3] = createWaypoint(true);
+        path[3].w[0] = 0;
+        path[3].w[1] = 0;
+        path[3].w[2] = 0;
         path[3].clear_wp_list = true;
     }
 
@@ -106,6 +109,7 @@ namespace bomb_drop
         waypoint.chi_d = windAngle;
         waypoint.set_current = current;
         waypoint.clear_wp_list = false;
+        return waypoint;
     }
 
     void bombDrop::publishWaypointPath(){
