@@ -30,8 +30,8 @@ namespace wind_estimator
 
         ros::NodeHandle nh_; //public for subscribing, publishing, etc
         ros::NodeHandle nhPrivate_;  //private for pulling parameter values from the parameter server
-        ros::Subscriber stateSubscriber;
-        ros::Publisher windEstimatePublisher;
+        ros::Subscriber StateSubscriber;
+        ros::Publisher WindEstimatePublisher;
 
         single_wind_sample StdDeviation; //holds std_deviation for each direction (treat as independent random variables)
         single_wind_sample Mean; //holds means value for each direction

@@ -21,9 +21,8 @@ namespace wind_estimator
         StdDeviation.wn = 0;
         Mean.we = 0;
         Mean.wn = 0;
-        stateSubscriber = nh_.subscribe("fixedwing/state", 10, &windEstimator::stateCallback, this);
-        windEstimatePublisher = nh_.advertise<rosplane_plugin_msgs::WindEstimate>("wind_estimate",10);
-
+        WindEstimatePublisher = nh_.advertise<rosplane_plugin_msgs::WindEstimate>("wind_estimate",10);
+        StateSubscriber = nh_.subscribe("state", 10, &windEstimator::stateCallback, this);
     }
 
     void windEstimator::stateCallback(const rosplane_msgs::State &msg){
@@ -56,7 +55,7 @@ namespace wind_estimator
         windEstimate.wn = Mean.wn;
         windEstimate.we = Mean.we;
         windEstimate.confidence = calculateConfidence();
-        windEstimatePublisher.publish(windEstimate);
+        WindEstimatePublisher.publish(windEstimate);
     }
 
     void windEstimator::calculateAverage()//function to calculate sample average
