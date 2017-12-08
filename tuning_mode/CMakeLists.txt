@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(rosplane_utils)
+project(tuning_mode)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -28,7 +28,7 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
 )
 
-install(PROGRAMS src/tuning_mode.py
+install(PROGRAMS src/tuning_mode/tuning_mode.py
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         )
 #install(DIRECTORY launch resource

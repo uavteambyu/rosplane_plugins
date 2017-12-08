@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+import sys
+
+from tuning_mode.tuning_mode import TuningMode
+from rqt_gui.main import Main
+
+plugin = 'tuning_mode.tuning_mode.TuningMode'
+main = Main(filename=plugin)
+sys.exit(main.main(standalone=plugin))

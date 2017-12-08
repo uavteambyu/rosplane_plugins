@@ -1,9 +1,14 @@
 <library path="src">
-  <class name="tuning_mode" type="tuning_mode.tuning_mode" base_class_type="rqt_gui_py::Plugin">
+  <class name="TuningMode" type="tuning_mode.tuning_mode.TuningMode" base_class_type="rqt_gui_py::Plugin">
     <description>
 	  GUI for tuning PID parameters for a fixed wing aircraft in flight.
     </description>
 	<qtgui>
+	  <group>
+		<label>ROSplane</label>
+		<icon type="theme">folder</icon>
+		<statustip>Plugins related to the AUVSI competition.</statustip>
+	  </group>
 	  <label>PID Tuning Mode</label>
 	  <icon type="theme">applications-other</icon>
 	  <statustip>GUI for tuning PID parameters for a fixed wing aircraft in flight.</statustip>
