@@ -7,6 +7,7 @@
 #include "bomb_drop/bomb_drop.h"
 #include <cstdlib>
 #include <math.h>
+
 namespace bomb_drop
 {
 
@@ -22,6 +23,7 @@ namespace bomb_drop
         stateArray[0].velocity.e = 0;
         stateArray[0].velocity.d = 0;
         windValid = false;
+        bombDropped = false;
         Ptarget.n = 0;
         Ptarget.e = 0;
         Ptarget.d = 0;
@@ -43,24 +45,28 @@ namespace bomb_drop
     }
 
     void bombDrop::stateCallback(const rosplane_msgs::State &msg) {
-        stateCoord.n = msg.position[0];
-        stateCoord.e = msg.position[1];
-        stateCoord.d = msg.position[2];
-        stateAirspeed = msg.Va;
-        stateCourseAngle = msg.chi;
-        if(inRange(stateAirspeed, stateArray[currentIndex].velocity.n, 1) &&
-                inRange(stateCoord.n, Pdrop.n, 5) &&
-                inRange(stateCoord.e, Pdrop.e, 5) &&
-                inRange(stateCoord.d, Pdrop.d, 5) &&
-                inRange(stateCourseAngle, windAngle, (10*M_PI/180))) {
-            // drop the bomb
-            rosflight_msgs::Command dropDaBomb;
-            dropDaBomb.ignore = rosflight_msgs::Command::IGNORE_X |
-            rosflight_msgs::Command::IGNORE_Y | rosflight_msgs::Command::IGNORE_Z |
-            rosflight_msgs::Command::IGNORE_F;
-            dropDaBomb.mode = rosflight_msgs::Command::MODE_PASS_THROUGH;
-            dropDaBomb.bomb_drop = 1;
-            commandPublisher.publish(dropDaBomb);
+        if (windValid == true && bombDropped == false) {
+            stateCoord.n = msg.position[0];
+            stateCoord.e = msg.position[1];
+            stateCoord.d = msg.position[2];
+            stateAirspeed = msg.Va;
+            stateCourseAngle = msg.chi;
+            if (inRange(stateAirspeed, stateArray[currentIndex].velocity.n, 3) &&
+                inRange(stateCoord.n, Pdrop.n, 15) &&
+                inRange(stateCoord.e, Pdrop.e, 15) &&
+                inRange(stateCoord.d, Pdrop.d, 15)
+                //inRange(stateCourseAngle, windAngle, (10 * M_PI / 180))
+                    ) {
+                // drop the bomb
+                rosflight_msgs::Command dropDaBomb;
+                dropDaBomb.ignore = rosflight_msgs::Command::IGNORE_X |
+                                    rosflight_msgs::Command::IGNORE_Y | rosflight_msgs::Command::IGNORE_Z |
+                                    rosflight_msgs::Command::IGNORE_F;
+                dropDaBomb.mode = rosflight_msgs::Command::MODE_PASS_THROUGH;
+                dropDaBomb.bomb_drop = 1;
+                bombDropped = true;
+                commandPublisher.publish(dropDaBomb);
+            }
         }
     }
 
@@ -95,11 +101,16 @@ namespace bomb_drop
         path[2].w[0] = Pdrop.n - 10*cos(windAngle)*Zdrop.n + 10*sin(windAngle)*Zdrop.e;
         path[2].w[1] = Pdrop.e - 10*sin(windAngle)*Zdrop.n - 10*cos(windAngle)*Zdrop.e;
         path[2].w[2] = Pdrop.d;
-        path[3] = createWaypoint(true);
-        path[3].w[0] = 0;
-        path[3].w[1] = 0;
-        path[3].w[2] = 0;
-        path[3].clear_wp_list = true;
+        path[3] = createWaypoint(false);
+        path[3].w[0] = Pdrop.n - 10*cos(windAngle)*Zdrop.n + 10*sin(windAngle)*Zdrop.e - 5*sin(windAngle)*Zdrop.n - 5*cos(windAngle)*Zdrop.e;
+        path[3].w[1] = Pdrop.e - 10*sin(windAngle)*Zdrop.n - 10*cos(windAngle)*Zdrop.e - 5*sin(windAngle)*Zdrop.n + 5*cos(windAngle)*Zdrop.e;
+        path[3].w[2] = Pdrop.d;
+        path[3].chi_d = path[3].chi_d - 90*M_PI/180;
+        path[4] = createWaypoint(true);
+        path[4].w[0] = 0;
+        path[4].w[1] = 0;
+        path[4].w[2] = 0;
+        path[4].clear_wp_list = true;
     }
 
     rosplane_msgs::Waypoint bombDrop::createWaypoint(bool current){

@@ -60,6 +60,7 @@ namespace bomb_drop
         coordinate stateCoord;
         float stateAirspeed;
         float stateCourseAngle;
+        bool bombDropped;
         rosplane_plugin_msgs::WindEstimate windEstimate;
         rosplane_msgs::Waypoint path[10];
         locationVelocity stateArray[5000];
