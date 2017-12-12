@@ -94,16 +94,16 @@ namespace bomb_drop
         path[0].w[1] = Pdrop.e;
         path[0].w[2] = Pdrop.d;
         path[1] = createWaypoint(false);
-        path[1].w[0] = Pdrop.n - 5*cos(windAngle)*Zdrop.n + 5*sin(windAngle)*Zdrop.e;
-        path[1].w[1] = Pdrop.e - 5*sin(windAngle)*Zdrop.n - 5*cos(windAngle)*Zdrop.e;
+        path[1].w[0] = Pdrop.n - 2*cos(windAngle)*Zdrop.n + 2*sin(windAngle)*Zdrop.e;
+        path[1].w[1] = Pdrop.e - 2*sin(windAngle)*Zdrop.n - 2*cos(windAngle)*Zdrop.e;
         path[1].w[2] = Pdrop.d;
         path[2] = createWaypoint(false);
-        path[2].w[0] = Pdrop.n - 10*cos(windAngle)*Zdrop.n + 10*sin(windAngle)*Zdrop.e;
-        path[2].w[1] = Pdrop.e - 10*sin(windAngle)*Zdrop.n - 10*cos(windAngle)*Zdrop.e;
+        path[2].w[0] = Pdrop.n - 4*cos(windAngle)*Zdrop.n + 4*sin(windAngle)*Zdrop.e;
+        path[2].w[1] = Pdrop.e - 4*sin(windAngle)*Zdrop.n - 4*cos(windAngle)*Zdrop.e;
         path[2].w[2] = Pdrop.d;
         path[3] = createWaypoint(false);
-        path[3].w[0] = Pdrop.n - 10*cos(windAngle)*Zdrop.n + 10*sin(windAngle)*Zdrop.e - 5*sin(windAngle)*Zdrop.n - 5*cos(windAngle)*Zdrop.e;
-        path[3].w[1] = Pdrop.e - 10*sin(windAngle)*Zdrop.n - 10*cos(windAngle)*Zdrop.e - 5*sin(windAngle)*Zdrop.n + 5*cos(windAngle)*Zdrop.e;
+        path[3].w[0] = Pdrop.n - 4*cos(windAngle)*Zdrop.n + 4*sin(windAngle)*Zdrop.e - 2*cos(windAngle + M_PI/2)*Zdrop.n + 2*sin(windAngle + M_PI/2)*Zdrop.e;
+        path[3].w[1] = Pdrop.e - 4*sin(windAngle)*Zdrop.n - 4*cos(windAngle)*Zdrop.e - 2*sin(windAngle + M_PI/2)*Zdrop.n - 2*cos(windAngle + M_PI/2)*Zdrop.e;
         path[3].w[2] = Pdrop.d;
         path[3].chi_d = path[3].chi_d - 90*M_PI/180;
         path[4] = createWaypoint(true);
@@ -124,7 +124,7 @@ namespace bomb_drop
     }
 
     void bombDrop::publishWaypointPath(){
-        for(int i = 3; i >=0; i--){
+        for(int i = 4; i >=0; i--){
             waypointPublisher.publish(path[i]);
         }
     }
