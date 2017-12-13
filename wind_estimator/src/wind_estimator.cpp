@@ -22,7 +22,7 @@ namespace wind_estimator
         Mean.we = 0;
         Mean.wn = 0;
         WindEstimatePublisher = nh_.advertise<rosplane_plugin_msgs::WindEstimate>("wind_estimate",10);
-        StateSubscriber = nh_.subscribe("state", 10, &windEstimator::stateCallback, this);
+        StateSubscriber = nh_.subscribe("fixedwing/state", 10, &windEstimator::stateCallback, this);
     }
 
     void windEstimator::stateCallback(const rosplane_msgs::State &msg){

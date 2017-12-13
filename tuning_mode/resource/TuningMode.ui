@@ -312,26 +312,6 @@
        </rect>
       </property>
      </widget>
-     <widget class="QOpenGLWidget" name="openGLWidget">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>170</y>
-        <width>391</width>
-        <height>141</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QOpenGLWidget" name="openGLWidget_2">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>500</y>
-        <width>391</width>
-        <height>141</height>
-       </rect>
-      </property>
-     </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -748,73 +728,6 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QOpenGLWidget" name="openGLWidget_3">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>150</y>
-        <width>391</width>
-        <height>111</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QOpenGLWidget" name="openGLWidget_4">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>420</y>
-        <width>391</width>
-        <height>111</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QOpenGLWidget" name="openGLWidget_5">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>670</y>
-        <width>391</width>
-        <height>111</height>
-       </rect>
-      </property>
-     </widget>
-     <zorder>horizontalSlider_6</zorder>
-     <zorder>label_15</zorder>
-     <zorder>label_16</zorder>
-     <zorder>label_17</zorder>
-     <zorder>label_18</zorder>
-     <zorder>label_19</zorder>
-     <zorder>label_20</zorder>
-     <zorder>label_21</zorder>
-     <zorder>label_22</zorder>
-     <zorder>label_23</zorder>
-     <zorder>label_24</zorder>
-     <zorder>label_25</zorder>
-     <zorder>label_26</zorder>
-     <zorder>label_27</zorder>
-     <zorder>label_28</zorder>
-     <zorder>label_29</zorder>
-     <zorder>label_30</zorder>
-     <zorder>label_31</zorder>
-     <zorder>label_32</zorder>
-     <zorder>label_33</zorder>
-     <zorder>label_34</zorder>
-     <zorder>label_35</zorder>
-     <zorder>horizontalSlider_8</zorder>
-     <zorder>horizontalSlider_7</zorder>
-     <zorder>horizontalSlider_9</zorder>
-     <zorder>horizontalSlider_10</zorder>
-     <zorder>lineEdit</zorder>
-     <zorder>lineEdit_2</zorder>
-     <zorder>lineEdit_3</zorder>
-     <zorder>lineEdit_4</zorder>
-     <zorder>lineEdit_5</zorder>
-     <zorder>lineEdit_6</zorder>
-     <zorder>horizontalSlider_11</zorder>
-     <zorder>centralwidget</zorder>
-     <zorder>openGLWidget_3</zorder>
-     <zorder>openGLWidget_4</zorder>
-     <zorder>openGLWidget_5</zorder>
     </widget>
    </widget>
    <widget class="QCheckBox" name="checkBox">
@@ -1038,7 +951,6 @@
   <zorder>menubar</zorder>
   <zorder>statusbar</zorder>
   <zorder>toolBar</zorder>
-  <zorder>tabWidget</zorder>
   <zorder>centralwidget</zorder>
  </widget>
  <resources/>
