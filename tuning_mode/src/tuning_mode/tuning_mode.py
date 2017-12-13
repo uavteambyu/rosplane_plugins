@@ -1,10 +1,13 @@
 import os
 import rospy
 import rospkg
+import pyqtgraph
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
+from rqt_plot.plot_widget import PlotWidget
+from rqt_plot.data_plot import DataPlot
 
 class TuningMode(Plugin):
 
@@ -38,10 +41,22 @@ class TuningMode(Plugin):
         # plugins at once. Also if you open multiple instances of your 
         # plugin at once, these lines add number to make it easy to 
         # tell from pane to pane.
+
+		# add plot widgets to the ui
+		#t_lat = self._widget.centralwidget.tabWidget.tab_lat
+		
+		
         if context.serial_number() > 1:
             self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % context.serial_number()))
         # Add widget to the user interface
         context.add_widget(self._widget)
+        self._plot_course = self._widget.findChild(PlotWidget,"plot_course")
+        self._plot_course = PlotWidget()
+        self._data_plot = DataPlot(self._plot_course)
+        self._data_plot.set_autoscale(x=False)
+        self._data_plot.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
+        self._data_plot.set_xlim([0, 10.0])
+        self._plot_course.switch_data_plot_widget(self._data_plot)
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
