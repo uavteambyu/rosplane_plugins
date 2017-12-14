@@ -49,7 +49,7 @@ class TuningMode(Plugin):
         course_c = self._widget.course_container
         self._tvc = PlotWidget(initial_topics=[('cc','chi_c'),('s','chi')])
         self._dpc = DataPlot(self._tvc)
-        self._dpc.set_autoscale(x=False)
+        self._dpc.set_autoscale(x=True)
         self._dpc.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
         self._dpc.set_xlim([0, 30.0])
         self._dpc.set_ylim([-6.28, 6.28])
@@ -59,7 +59,7 @@ class TuningMode(Plugin):
         roll_c = self._widget.roll_container
         self._tvr = PlotWidget(initial_topics=[('ci','phi_c'),('s','phi')])
         self._dpr = DataPlot(self._tvr)
-        self._dpr.set_autoscale(x=False)
+        self._dpr.set_autoscale(x=True)
         self._dpr.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
         self._dpr.set_xlim([0, 30.0])
         self._dpr.set_ylim([-6.28, 6.28])
