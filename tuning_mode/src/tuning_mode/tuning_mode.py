@@ -42,21 +42,22 @@ class TuningMode(Plugin):
         # plugin at once, these lines add number to make it easy to 
         # tell from pane to pane.
 
-		# add plot widgets to the ui
-		#t_lat = self._widget.centralwidget.tabWidget.tab_lat
-		
-		
         if context.serial_number() > 1:
             self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % context.serial_number()))
+        # add plot widgets to the ui
+        self._plot_course = self._widget.findChild(PlotWidget,"plot_course")
+        self._plot_course = PlotWidget(initial_topics=["/fixedwing/state"])
+        self._dp_course = DataPlot(self._plot_course)
+        self._dp_course.set_autoscale(x=False)
+        self._dp_course.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
+        self._dp_course.set_xlim([0, 10.0])
+        self._plot_course.switch_data_plot_widget(self._dp_course)
+        #self._plot_course.add_topic('/fixedwing/state')
+        self._plot_course._update_plot_timer.start(self._plot_course._redraw_interval)
+        
         # Add widget to the user interface
         context.add_widget(self._widget)
-        self._plot_course = self._widget.findChild(PlotWidget,"plot_course")
-        self._plot_course = PlotWidget()
-        self._data_plot = DataPlot(self._plot_course)
-        self._data_plot.set_autoscale(x=False)
-        self._data_plot.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
-        self._data_plot.set_xlim([0, 10.0])
-        self._plot_course.switch_data_plot_widget(self._data_plot)
+        
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
