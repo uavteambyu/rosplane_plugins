@@ -8,7 +8,7 @@ import roslib.message
 import roslib.names
 import rospy
 
-#from .map_subscribers import *
+from .map_subscribers import *
 from python_qt_binding.QtCore import QTimer
 
 class RosPlotException(Exception):

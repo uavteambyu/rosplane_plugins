@@ -13,7 +13,7 @@ from rqt_py_common import topic_helpers
 
 from .rosplot import ROSData, RosPlotException
 
-#from .map_subscribers import *
+from .map_subscribers import *
 PWD = os.path.dirname(os.path.abspath(__file__))
 
 def get_plot_fields(topic_name):
@@ -116,7 +116,7 @@ class PlotWidget(QWidget):
             'Pitch angle vs. Commanded':[('s','theta'),('ci','theta_c')],
             'Airspeed vs. Commanded':[('s','Va'),('cc','Va_c')]
             }
-
+            
         # # Available ros topics for plotting
         # self.message_dict = {
         #     'Course angle (rad)':'/state/chi',
