@@ -144,12 +144,8 @@ class PlotWidget(QWidget):
         ui_file = os.path.join(PWD, 'resources', 'plot.ui')
         loadUi(ui_file, self)
 
-        self.pause_button.setIcon(QIcon.fromTheme('media-playback-pause'))
         self.clear_button.setIcon(QIcon.fromTheme('edit-clear'))
         self.data_plot = None
-
-        if start_paused:
-            self.pause_button.setChecked(True)
 
         self._start_time = rospy.get_time()
         self._rosdata = {}
@@ -159,10 +155,10 @@ class PlotWidget(QWidget):
 
         self._remove_topic_menu = QMenu()
 
-        self._msgs.clear()
-        self._msgs.addItems(self.message_dict.keys())
+        #self._msgs.clear()
+        #self._msgs.addItems(self.message_dict.keys())
 
-        self._msgs.currentIndexChanged[str].connect(self._draw_graph) # <<<<<<< start here (also modify the dict)
+        #self._msgs.currentIndexChanged[str].connect(self._draw_graph) # <<<<<<< start here (also modify the dict)
 
         # init and start update timer for plot
         self._update_plot_timer = QTimer(self)
@@ -201,7 +197,7 @@ class PlotWidget(QWidget):
         # NOT GONNA WORRY ABOUT THIS!
         # plottable, message = is_plottable(self.message_dict[self._msgs.currentText()]) # <<<<<< will feed this a list
 
-        if self._current_key and not (self._msgs.currentText() == self._current_key):
+        if self._current_key:
             for topic_tuple in self._current_topics:
                 #print 'removing %s from plot' % topic # ------------------------
                 self.remove_topic(topic_tuple[0], topic_tuple[1])
@@ -209,7 +205,7 @@ class PlotWidget(QWidget):
 
         self._current_topics = []
 
-        self._current_key = self._msgs.currentText()
+        #self._current_key = self._msgs.currentText()
         #print 'current key:', self._current_key
         for topic_tuple in self.message_dict[self._current_key]:
             #topic = get_topic(topic_tuple)
@@ -219,10 +215,6 @@ class PlotWidget(QWidget):
             #print 'adding %s to plot' % topic # --------------------------
             self.add_topic(topic_tuple[0], topic_tuple[1])
         self._subscribed_topics_changed()
-
-    @Slot(bool)
-    def on_pause_button_clicked(self, checked):
-        self.enable_timer(not checked)
 
     @Slot()
     def on_clear_button_clicked(self):
@@ -244,9 +236,7 @@ class PlotWidget(QWidget):
 
     def _subscribed_topics_changed(self):
         #self._update_remove_topic_menu() # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        if not self.pause_button.isChecked():
-            # if pause button is not pressed, enable timer based on subscribed topics
-            self.enable_timer(self._rosdata)
+        self.enable_timer(self._rosdata)
         self.data_plot.redraw()
 
     def _update_remove_topic_menu(self):
