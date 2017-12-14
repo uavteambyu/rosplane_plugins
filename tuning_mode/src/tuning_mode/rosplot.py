@@ -82,6 +82,8 @@ class ROSData(object):
                 self.timer.timeout.connect(self.state_theta_cb)
             elif topic_item == 'Va':
                 self.timer.timeout.connect(self.state_Va_cb)
+            elif topic_item == 'alt':
+            	self.timer.timeout.connect(self.state_alt_cb)
         elif topic_code == 'ci':
             if topic_item == 'phi_c':
                 self.timer.timeout.connect(self.conin_phi_c_cb)
@@ -92,6 +94,8 @@ class ROSData(object):
                 self.timer.timeout.connect(self.concom_chi_c_cb)
             elif topic_item == 'Va_c':
                 self.timer.timeout.connect(self.concom_Va_c_cb)
+            elif topic_item == 'h_c':
+            	self.timer.timeout.connect(self.concom_h_c_cb)
 
         self.timer.start()
 
@@ -114,6 +118,10 @@ class ROSData(object):
         self.buff_x.append(rospy.get_time() - self.start_time)
         self.buff_y.append(StateSub.Va)
 
+    def state_alt_cb(self):
+        self.buff_x.append(rospy.get_time() - self.start_time)
+        self.buff_y.append(StateSub.alt)
+
     def conin_phi_c_cb(self):
         self.buff_x.append(rospy.get_time() - self.start_time)
         self.buff_y.append(ConInSub.phi_c)
@@ -129,6 +137,10 @@ class ROSData(object):
     def concom_Va_c_cb(self):
         self.buff_x.append(rospy.get_time() - self.start_time)
         self.buff_y.append(ConComSub.Va_c)
+
+    def concom_h_c_cb(self):
+        self.buff_x.append(rospy.get_time() - self.start_time)
+        self.buff_y.append(ConComSub.h_c)
 
     def next(self):
         """

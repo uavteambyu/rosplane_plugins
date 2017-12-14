@@ -89,6 +89,7 @@ class StateSub():
         StateSub.phi = state.phi
         StateSub.theta = state.theta
         StateSub.psi = state.psi
+        StateSub.alt = -state.position[2]	# position is in ned coords. negative to make it altitude
         StateSub.enabled = True
 
     @staticmethod
@@ -107,6 +108,7 @@ class StateSub():
         StateSub.theta = 0.0
         StateSub.psi = 0.0
         StateSub.chi = 0.0
+        StateSub.alt = 0.0
         if not StateSub.state_sub is None:
             StateSub.state_sub.unregister()
             StateSub.state_sub = None
@@ -168,6 +170,7 @@ class ConComSub():
     Va_c = 0.0
     h_c = 0.0
     chi_c = 0.0
+    h_c = 0.0
     enabled = False
 
     @staticmethod

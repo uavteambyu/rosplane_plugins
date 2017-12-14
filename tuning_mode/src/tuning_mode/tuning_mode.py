@@ -79,7 +79,7 @@ class TuningMode(Plugin):
         pitch_c.addWidget(self._tvp, 1) # ratio of these numbers determines window proportions
         ## Altitude plot
         alt_c = self._widget.altitude_container
-        self._tva = PlotWidget(initial_topics=[('cc','h_c'),('s','position[2]')])
+        self._tva = PlotWidget(initial_topics=[('cc','h_c'),('s','alt')])
         self._dpa = DataPlot(self._tva)
         self._dpa.set_autoscale(x=True)
         self._dpa.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)

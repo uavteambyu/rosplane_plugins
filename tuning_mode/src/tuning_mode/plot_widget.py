@@ -179,6 +179,7 @@ class PlotWidget(QWidget):
         self.data_plot.dropEvent = self.dropEvent
         self.data_plot.dragEnterEvent = self.dragEnterEvent
         
+        # set up initial topics:
         if self._initial_topics:
             for topic_tuple in self._initial_topics:
                 self._current_topics.append(topic_tuple)
