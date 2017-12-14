@@ -68,7 +68,7 @@ class WaypointPlanner(Plugin):
         #Text Edits
         self.locationLineEdit = self._widget.findChild(QLineEdit,"locationLineEdit")
         self.locationLineEdit.setText("50,50,-50")
-        regexp = QRegExp("\d+,\d+,-\d+")
+        regexp = QRegExp("-?\d+,-?\d+,-\d+")
         validator = QRegExpValidator(regexp)
         self.locationLineEdit.setValidator(validator)
         regexp1 = QRegExp("\d+")
@@ -161,7 +161,7 @@ class WaypointPlanner(Plugin):
             waypoint.w[0] = float(row[0])
             waypoint.w[1] = float(row[1])
             waypoint.w[2] = float(row[2])
-            temp = float(row[3])*2*math.pi/360
+            temp = float(row[3])
             waypoint.chi_d = temp
             waypoint.Va_d = float(row[4])
             self.waypoints.append(waypoint)
