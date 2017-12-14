@@ -138,7 +138,7 @@ class PlotWidget(QWidget):
         #     'Groundspeed (m/s)':'/state/Vg'
         #     }
 
-        #self._initial_topics = initial_topics
+        self._initial_topics = initial_topics
 
         rp = rospkg.RosPack()
         ui_file = os.path.join(PWD, 'resources', 'plot.ui')
@@ -182,18 +182,19 @@ class PlotWidget(QWidget):
         # setup drag 'n drop
         self.data_plot.dropEvent = self.dropEvent
         self.data_plot.dragEnterEvent = self.dragEnterEvent
-        '''
+        
         if self._initial_topics:
-            for topic_name in self._initial_topics:
-                self.add_topic(topic_name)
+            for topic_tuple in self._initial_topics:
+                self._current_topics.append(topic_tuple)
+                self.add_topic(topic_tuple[0], topic_tuple[1])
             self._initial_topics = None
-        else:
-            for topic_name, rosdata in self._rosdata.items():
-                data_x, data_y = rosdata.next()
-                self.data_plot.add_curve(topic_name, topic_name, data_x, data_y)
+        #else:
+        #    for topic_name, rosdata in self._rosdata.items():
+        #        data_x, data_y = rosdata.next()
+        #        self.data_plot.add_curve(topic_name, topic_name, data_x, data_y)
 
         self._subscribed_topics_changed()
-        '''
+        
 
     def _draw_graph(self):
         #print 'entering _draw_graph'

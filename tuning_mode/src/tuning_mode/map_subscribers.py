@@ -83,18 +83,13 @@ class StateSub():
 
     @staticmethod
     def state_callback(state):
-        if InitSub.enabled:
-            n = state.position[0]
-            e = state.position[1]
-            d = state.position[2]
-            StateSub.lat, StateSub.lon, StateSub.alt = InitSub.GB.ned_to_gps(n, e, d)
-            #StateSub.alt -= InitSub.init_latlonalt[2]
-            StateSub.chi = fmod(state.chi, 2*pi)
-            StateSub.Va = state.Va
-            StateSub.phi = state.phi
-            StateSub.theta = state.theta
-            StateSub.psi = state.psi
-            StateSub.enabled = True
+    	#StateSub.alt -= InitSub.init_latlonalt[2]
+        StateSub.chi = fmod(state.chi, 2*pi)
+        StateSub.Va = state.Va
+        StateSub.phi = state.phi
+        StateSub.theta = state.theta
+        StateSub.psi = state.psi
+        StateSub.enabled = True
 
     @staticmethod
     def closeSubscriber():
@@ -191,7 +186,7 @@ class ConComSub():
     def callback_ConCom(controller_commands):
         ConComSub.Va_c = controller_commands.Va_c
         ConComSub.h_c = controller_commands.h_c
-        ConComSub.chi_c = controller_commands.chi_c
+        ConComSub.chi_c = fmod(controller_commands.chi_c, 2*pi)	# wrap commanded course to match state
         ConComSub.enabled = True
 
     @staticmethod

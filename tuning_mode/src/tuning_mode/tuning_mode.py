@@ -45,29 +45,24 @@ class TuningMode(Plugin):
         if context.serial_number() > 1:
             self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % context.serial_number()))
         # add plot widgets to the ui
-        
-        cont = self._widget.course_container
-        
-        self._tv = PlotWidget()
-        self._data_plot = DataPlot(self._tv)
+        ## Course plot ##
+        course_c = self._widget.course_container
+        self._tvc = PlotWidget(initial_topics=[('cc','chi_c'),('s','chi')])
+        self._data_plot = DataPlot(self._tvc)
         self._data_plot.set_autoscale(x=False)
         self._data_plot.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
         self._data_plot.set_xlim([0, 10.0])
-        self._tv.switch_data_plot_widget(self._data_plot)
-
-        cont.addWidget(self._tv, 1) # ratio of these numbers determines window proportions
-        
-        
-        #self._plot_course = self._widget.findChild(PlotWidget,"plot_course")
-        #self._plot_course = PlotWidget(initial_topics="/sonar/range")
-        #self._dp_course = DataPlot(self._plot_course)
-        #self._dp_course.set_autoscale(x=False)
-        #self._dp_course.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
-        #self._dp_course.set_xlim([0, 10.0])
-        #self._plot_course.switch_data_plot_widget(self._dp_course)
-        #self._plot_course.add_topic('/sonar','range')
-        ##self._plot_course._update_plot_timer.start(self._plot_course._redraw_interval)
-        #self._plot_course.enable_timer(True)
+        self._tvc.switch_data_plot_widget(self._data_plot)
+        course_c.addWidget(self._tvc, 1) # ratio of these numbers determines window proportions
+        ## Roll plot
+        roll_c = self._widget.roll_container
+        self._tvr = PlotWidget(initial_topics=[('ci','phi_c'),('s','phi')])
+        self._data_plot = DataPlot(self._tvr)
+        self._data_plot.set_autoscale(x=False)
+        self._data_plot.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
+        self._data_plot.set_xlim([0, 10.0])
+        self._tvr.switch_data_plot_widget(self._data_plot)
+		roll_c.addWidget(self._tvr, 1) # ratio of these numbers determines window proportions
         
         # Add widget to the user interface
         context.add_widget(self._widget)
