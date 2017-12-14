@@ -116,7 +116,12 @@ class PlotWidget(QWidget):
             'Pitch angle vs. Commanded':[('s','theta'),('ci','theta_c')],
             'Airspeed vs. Commanded':[('s','Va'),('cc','Va_c')]
             }
-            
+        
+        # initialize subscriber topics
+        StateSub.updateStateTopic('/fixedwing/state')
+        ConInSub.updateConInTopic('/fixedwing/controller_inners')
+        ConComSub.updateConComTopic('/fixedwing/controller_commands')
+        
         # # Available ros topics for plotting
         # self.message_dict = {
         #     'Course angle (rad)':'/state/chi',
