@@ -69,7 +69,7 @@ class TuningMode(Plugin):
 
         ## Pitch plot
         pitch_c = self._widget.pitch_container
-        self._tvp = PlotWidget(initial_topics=[('ci','phi_c'),('s','phi')])
+        self._tvp = PlotWidget(initial_topics=[('ci','theta_c'),('s','theta')])
         self._dpp = DataPlot(self._tvr)
         self._dpp.set_autoscale(x=True)
         self._dpp.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
@@ -79,7 +79,7 @@ class TuningMode(Plugin):
         pitch_c.addWidget(self._tvp, 1) # ratio of these numbers determines window proportions
         ## Altitude plot
         alt_c = self._widget.altitude_container
-        self._tva = PlotWidget(initial_topics=[('cc','phi_c'),('s','phi')])
+        self._tva = PlotWidget(initial_topics=[('cc','h_c'),('s','position[2]')])
         self._dpa = DataPlot(self._tva)
         self._dpa.set_autoscale(x=True)
         self._dpa.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
@@ -89,7 +89,7 @@ class TuningMode(Plugin):
         alt_c.addWidget(self._tva, 1) # ratio of these numbers determines window proportions
         ## Airspeed plot
         va_c = self._widget.airspeed_container
-        self._tvv = PlotWidget(initial_topics=[('cc','phi_c'),('s','phi')])
+        self._tvv = PlotWidget(initial_topics=[('cc','Va_c'),('s','Va')])
         self._dpv = DataPlot(self._tvv)
         self._dpv.set_autoscale(x=True)
         self._dpv.set_autoscale(y=DataPlot.SCALE_EXTEND|DataPlot.SCALE_VISIBLE)
