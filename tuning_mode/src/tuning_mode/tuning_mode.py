@@ -110,7 +110,7 @@ class TuningMode(Plugin):
         context.add_widget(self._widget)
         
         # set up dynamic reconfigure, so controller will see changes to gains
-        self.client = dynamic_reconfigure.client.Client('/fixedwing/rosplane_controller')
+        self.client = dynamic_reconfigure.client.Client('/fixedwing/autopilot')
         
         
         # connect sliders to ros parameters
@@ -133,7 +133,7 @@ class TuningMode(Plugin):
         (a,b) = rosnode.kill_nodes(['/fixedwing/pathfollower'])
         print a,b
         # start giving step commands in roll:
-        Popen(["rosrun", "tuning_mode", "tune_roll.py", "controller_commands:=/fixedwing/controller_commands"])
+        Popen(["rosrun", "tuning_mode", "tune_roll.py", "controller_commands:=/fixedwing/autopilot"])
         
     def shutdown_plugin(self):
         # TODO unregister all publishers here
@@ -176,7 +176,7 @@ class tuneSlider():
 			self.pmin = val[0]
 		
 		self.txt = s.parent().findChildren(QLineEdit)[0]
-		self.paramkey = '/fixedwing/rosplane_controller/' + s.property('objectName')
+		self.paramkey = '/fixedwing/autopilot/' + s.property('objectName')
 		self.paramitem = s.property('objectName')
 		self.paramval = 0
 		self.fetch_param()	# get initial param value and put in text box
