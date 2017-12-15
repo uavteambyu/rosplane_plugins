@@ -1,13 +1,17 @@
 import os
 import rospy
 import rospkg
+import rosnode
 import pyqtgraph
+from subprocess import Popen
 
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
+from python_qt_binding.QtWidgets import QSlider
 from .plot_widget import PlotWidget
 from rqt_plot.data_plot import DataPlot
+from .tune_roll import *
 
 class TuningMode(Plugin):
 
@@ -98,11 +102,26 @@ class TuningMode(Plugin):
         self._tvv.switch_data_plot_widget(self._dpv)
         va_c.addWidget(self._tvv, 1) # ratio of these numbers determines window proportions
 
+        # add binding to button to start tuning mode:
+        #self._widget.start_tune_btn.clicked.connect(self.tune_roll)
+        
+        # connect sliders to ros parameters
+        sliders = self._widget.findChildren(QSlider)
+        for s in sliders:
+            if not s.rosparam == None:
+                s.value = rosparam_get('/fixedwing/autopilot/' + s.rosparam)
 
         # Add widget to the user interface
         context.add_widget(self._widget)
         
-
+	
+    def tune_roll(self):
+        # kill path follower
+        (a,b) = rosnode.kill_nodes(['/fixedwing/pathfollower'])
+        print a,b
+        # start giving step commands in roll:
+        Popen(["rosrun", "tuning_mode", "tune_roll.py", "controller_commands:=/fixedwing/controller_commands"])
+        
     def shutdown_plugin(self):
         # TODO unregister all publishers here
         pass

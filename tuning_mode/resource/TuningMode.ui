@@ -352,17 +352,20 @@
      <attribute name="title">
       <string>Longitudinal</string>
      </attribute>
-     <widget class="QSlider" name="horizontalSlider_6">
+     <widget class="QSlider" name="pitch_kd_slider">
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>160</y>
+        <y>170</y>
         <width>261</width>
         <height>29</height>
        </rect>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="rosparam" stdset="0">
+       <string>PITCH_KD</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_15">
@@ -638,7 +641,7 @@
        <string>Integral Gain</string>
       </property>
      </widget>
-     <widget class="QSlider" name="horizontalSlider_8">
+     <widget class="QSlider" name="pitch_kp_slider">
       <property name="geometry">
        <rect>
         <x>90</x>
@@ -649,6 +652,9 @@
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="rosparam" stdset="0">
+       <string>PITCH_KP</string>
       </property>
      </widget>
      <widget class="QSlider" name="horizontalSlider_7">
@@ -690,17 +696,17 @@
        <enum>Qt::Horizontal</enum>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="pitch_kd_txt">
       <property name="geometry">
        <rect>
         <x>400</x>
-        <y>160</y>
+        <y>170</y>
         <width>61</width>
         <height>27</height>
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_2">
+     <widget class="QLineEdit" name="pitch_kp_txt">
       <property name="geometry">
        <rect>
         <x>400</x>
@@ -832,7 +838,7 @@
     <string>toolBar</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>790</x>
@@ -928,7 +934,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="start_tune_btn">
       <property name="text">
        <string>Start Tuning Mode</string>
       </property>
@@ -944,24 +950,11 @@
     </item>
    </layout>
   </widget>
+  <zorder>layoutWidget</zorder>
   <zorder>menubar</zorder>
   <zorder>statusbar</zorder>
   <zorder>toolBar</zorder>
   <zorder>centralwidget</zorder>
-  <zorder>pushButton_2</zorder>
-  <zorder>label_37</zorder>
-  <zorder>checkBox_3</zorder>
-  <zorder>checkBox_4</zorder>
-  <zorder>radioButton</zorder>
-  <zorder>checkBox_2</zorder>
-  <zorder>radioButton_5</zorder>
-  <zorder>checkBox_5</zorder>
-  <zorder>radioButton_2</zorder>
-  <zorder>pushButton</zorder>
-  <zorder>checkBox</zorder>
-  <zorder>radioButton_4</zorder>
-  <zorder>label_36</zorder>
-  <zorder>radioButton_3</zorder>
  </widget>
  <resources/>
  <connections/>
