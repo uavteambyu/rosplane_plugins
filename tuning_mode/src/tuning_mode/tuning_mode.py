@@ -8,7 +8,7 @@ from subprocess import Popen
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtWidgets import QWidget
-from python_qt_binding.QtWidgets import QSlider
+from python_qt_binding.QtWidgets import QSlider, QLabel, QLineEdit
 from .plot_widget import PlotWidget
 from rqt_plot.data_plot import DataPlot
 from .tune_roll import *
@@ -107,9 +107,10 @@ class TuningMode(Plugin):
         
         # connect sliders to ros parameters
         sliders = self._widget.findChildren(QSlider)
+        tuners = []
         for s in sliders:
-            if not s.rosparam == None:
-                s.value = rosparam_get('/fixedwing/autopilot/' + s.rosparam)
+            print s.property('objectName')
+            tuners.append(tuneSlider(s))
 
         # Add widget to the user interface
         context.add_widget(self._widget)
@@ -140,3 +141,25 @@ class TuningMode(Plugin):
         # Comment in to signal that the plugin has a way to configure
         # This will enable a setting button (gear icon) in each dock widget title bar
         # Usually used to open a modal configuration dialog
+ 
+class tuneSlider():
+	def __init__(self, s):
+		# extract min/max values from labels near slider:
+		val = []
+		print(s.parent().findChildren(QLabel))
+		for l in s.parent().findChildren(QLabel):
+			try:
+				# convert text from label to number, store it
+			    val.append(float(l.property('text')))
+			except Exception as e:
+				pass
+		if val[0] > val[1]:
+			pmax = val[0]
+			pmin = val[1]
+		else:
+			pmax = val[1]
+			pmin = val[0]
+		
+		self.paramval = rospy.get_param('/fixedwing/autopilot/' + s.property('objectName'))
+		s.setValue(int((self.paramval - pmin) * 100/(pmax-pmin)))
+		s.parent().findChildren(QLineEdit)[0].setText(str(self.paramval))
