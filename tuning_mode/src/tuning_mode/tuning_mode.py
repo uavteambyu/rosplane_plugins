@@ -12,6 +12,7 @@ from python_qt_binding.QtWidgets import QSlider, QLabel, QLineEdit
 from .plot_widget import PlotWidget
 from rqt_plot.data_plot import DataPlot
 from .tune_roll import *
+import dynamic_reconfigure.client
 
 class TuningMode(Plugin):
 
@@ -108,12 +109,16 @@ class TuningMode(Plugin):
         # Add widget to the user interface
         context.add_widget(self._widget)
         
+        # set up dynamic reconfigure, so controller will see changes to gains
+        self.client = dynamic_reconfigure.client.Client('/rosplane_controller')
+        
+        
         # connect sliders to ros parameters
         sliders = self._widget.findChildren(QSlider)
         self.tuners = []
         for s in sliders:
-            print s.property('objectName')
-            self.tuners.append(tuneSlider(s))
+            #print s.property('objectName')
+            self.tuners.append(tuneSlider(s, self.client))
             
         # set button callback
         self._widget.set_params_btn.clicked.connect(self.set_params_sliders)
@@ -150,9 +155,11 @@ class TuningMode(Plugin):
         # Usually used to open a modal configuration dialog
  
 class tuneSlider():
-	def __init__(self, s):
+	def __init__(self, s, dynclient):
 		self.slider = s
 		s.setTracking(False)
+		self.client = dynclient
+		
 		# extract min/max values from labels near slider:
 		val = []
 		for l in s.parent().findChildren(QLabel):
@@ -169,7 +176,8 @@ class tuneSlider():
 			self.pmin = val[0]
 		
 		self.txt = s.parent().findChildren(QLineEdit)[0]
-		self.paramkey = '/fixedwing/autopilot/' + s.property('objectName')
+		self.paramkey = '/rosplane_controller/' + s.property('objectName')
+		self.paramitem = s.property('objectName')
 		self.paramval = 0
 		self.fetch_param()	# get initial param value and put in text box
 		# set slider position
@@ -189,15 +197,12 @@ class tuneSlider():
 		self.slider.setValue(int((self.paramval - self.pmin) * 100/(self.pmax-self.pmin)))
 
 	def sliderChanged(self, svalue):
-		print 'slider changed', svalue
 		# get normal value from slider:
 		val = self.pmin + svalue/100.0 * (self.pmax-self.pmin)
-		print val
 		# update the text and let the text callback change the param:
 		self.txt.setText(str(val))
 		
 	def txtChanged(self):
-		print 'text changed'
 		# make sure text is valid first:
 		try:
 			val = float(self.txt.property('text'))
@@ -205,8 +210,10 @@ class tuneSlider():
 			print 'not a numeric value'
 			return
 		# update ros param
-		rospy.set_param(self.paramkey, val)
+		#rospy.set_param(self.paramkey, val)
+		self.client.update_configuration({self.paramitem : val})
 		# update text according to ros param to confirm it worked
 		self.fetch_param()
 		# update slider
 		self.setSlider()
+		print self.paramitem, '=', self.paramval
