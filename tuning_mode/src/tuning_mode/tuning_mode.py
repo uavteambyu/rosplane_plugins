@@ -6,7 +6,7 @@ import pyqtgraph
 from subprocess import Popen
 
 from qt_gui.plugin import Plugin
-from python_qt_binding import loadUi
+from python_qt_binding import loadUi, QtCore
 from python_qt_binding.QtWidgets import QWidget
 from python_qt_binding.QtWidgets import QSlider, QLabel, QLineEdit
 from .plot_widget import PlotWidget
@@ -105,16 +105,23 @@ class TuningMode(Plugin):
         # add binding to button to start tuning mode:
         #self._widget.start_tune_btn.clicked.connect(self.tune_roll)
         
-        # connect sliders to ros parameters
-        sliders = self._widget.findChildren(QSlider)
-        tuners = []
-        for s in sliders:
-            print s.property('objectName')
-            tuners.append(tuneSlider(s))
-
         # Add widget to the user interface
         context.add_widget(self._widget)
         
+        # connect sliders to ros parameters
+        sliders = self._widget.findChildren(QSlider)
+        self.tuners = []
+        for s in sliders:
+            print s.property('objectName')
+            self.tuners.append(tuneSlider(s))
+            
+        # set button callback
+        self._widget.set_params_btn.clicked.connect(self.set_params_sliders)
+        
+    def set_params_sliders(self):
+		print 'set all params'
+		for t in self.tuners:
+			t.sliderChanged(t.slider.value())        
 	
     def tune_roll(self):
         # kill path follower
@@ -144,9 +151,10 @@ class TuningMode(Plugin):
  
 class tuneSlider():
 	def __init__(self, s):
+		self.slider = s
+		s.setTracking(False)
 		# extract min/max values from labels near slider:
 		val = []
-		print(s.parent().findChildren(QLabel))
 		for l in s.parent().findChildren(QLabel):
 			try:
 				# convert text from label to number, store it
@@ -154,12 +162,51 @@ class tuneSlider():
 			except Exception as e:
 				pass
 		if val[0] > val[1]:
-			pmax = val[0]
-			pmin = val[1]
+			self.pmax = val[0]
+			self.pmin = val[1]
 		else:
-			pmax = val[1]
-			pmin = val[0]
+			self.pmax = val[1]
+			self.pmin = val[0]
 		
-		self.paramval = rospy.get_param('/fixedwing/autopilot/' + s.property('objectName'))
-		s.setValue(int((self.paramval - pmin) * 100/(pmax-pmin)))
-		s.parent().findChildren(QLineEdit)[0].setText(str(self.paramval))
+		self.txt = s.parent().findChildren(QLineEdit)[0]
+		self.paramkey = '/fixedwing/autopilot/' + s.property('objectName')
+		self.paramval = 0
+		self.fetch_param()	# get initial param value and put in text box
+		# set slider position
+		self.setSlider()
+
+		# set callbacks to update parameters
+		self.txt.textChanged.connect(self.txtChanged)
+		s.valueChanged.connect(self.sliderChanged)
+		#QtCore.QObject.connect(self.slider, QtCore.SIGNAL('valueChanged(int)'), self.sliderChanged)
+	
+	# gets param from ros and then puts it in the text box
+	def fetch_param(self):
+		self.paramval = float(rospy.get_param(self.paramkey))
+		self.txt.setText(str(self.paramval))
+
+	def setSlider(self):
+		self.slider.setValue(int((self.paramval - self.pmin) * 100/(self.pmax-self.pmin)))
+
+	def sliderChanged(self, svalue):
+		print 'slider changed', svalue
+		# get normal value from slider:
+		val = self.pmin + svalue/100.0 * (self.pmax-self.pmin)
+		print val
+		# update the text and let the text callback change the param:
+		self.txt.setText(str(val))
+		
+	def txtChanged(self):
+		print 'text changed'
+		# make sure text is valid first:
+		try:
+			val = float(self.txt.property('text'))
+		except:
+			print 'not a numeric value'
+			return
+		# update ros param
+		rospy.set_param(self.paramkey, val)
+		# update text according to ros param to confirm it worked
+		self.fetch_param()
+		# update slider
+		self.setSlider()

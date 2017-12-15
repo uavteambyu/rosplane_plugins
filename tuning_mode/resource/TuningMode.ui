@@ -32,7 +32,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_lat">
      <attribute name="title">
@@ -118,6 +118,9 @@
        </item>
        <item>
         <widget class="QSlider" name="ROLL_KD">
+         <property name="tracking">
+          <bool>false</bool>
+         </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -706,36 +709,66 @@
     </item>
     <item>
      <widget class="QCheckBox" name="checkBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Roll</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QCheckBox" name="checkBox_2">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Course</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QCheckBox" name="checkBox_3">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Pitch</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QCheckBox" name="checkBox_4">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Altitude</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QCheckBox" name="checkBox_5">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Airspeed</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -748,6 +781,9 @@
     </item>
     <item>
      <widget class="QRadioButton" name="radioButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Roll</string>
       </property>
@@ -755,6 +791,9 @@
     </item>
     <item>
      <widget class="QRadioButton" name="radioButton_2">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Course</string>
       </property>
@@ -762,6 +801,9 @@
     </item>
     <item>
      <widget class="QRadioButton" name="radioButton_3">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Pitch</string>
       </property>
@@ -769,6 +811,9 @@
     </item>
     <item>
      <widget class="QRadioButton" name="radioButton_4">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Altitude</string>
       </property>
@@ -776,6 +821,9 @@
     </item>
     <item>
      <widget class="QRadioButton" name="radioButton_5">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Airspeed</string>
       </property>
@@ -783,6 +831,9 @@
     </item>
     <item>
      <widget class="QPushButton" name="start_tune_btn">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Start Tuning Mode</string>
       </property>
@@ -790,6 +841,9 @@
     </item>
     <item>
      <widget class="QPushButton" name="pushButton_2">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Stop Tuning Mode and
  Enable Current Loop</string>
@@ -798,11 +852,25 @@
     </item>
    </layout>
   </widget>
+  <widget class="QPushButton" name="set_params_btn">
+   <property name="geometry">
+    <rect>
+     <x>787</x>
+     <y>510</y>
+     <width>191</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Set all params from sliders</string>
+   </property>
+  </widget>
   <zorder>layoutWidget</zorder>
   <zorder>menubar</zorder>
   <zorder>statusbar</zorder>
   <zorder>toolBar</zorder>
   <zorder>centralwidget</zorder>
+  <zorder>set_params_btn</zorder>
  </widget>
  <resources/>
  <connections/>
