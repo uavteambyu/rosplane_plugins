@@ -110,7 +110,7 @@ class TuningMode(Plugin):
         context.add_widget(self._widget)
         
         # set up dynamic reconfigure, so controller will see changes to gains
-        self.client = dynamic_reconfigure.client.Client('/rosplane_controller')
+        self.client = dynamic_reconfigure.client.Client('/fixedwing/rosplane_controller')
         
         
         # connect sliders to ros parameters
@@ -176,7 +176,7 @@ class tuneSlider():
 			self.pmin = val[0]
 		
 		self.txt = s.parent().findChildren(QLineEdit)[0]
-		self.paramkey = '/rosplane_controller/' + s.property('objectName')
+		self.paramkey = '/fixedwing/rosplane_controller/' + s.property('objectName')
 		self.paramitem = s.property('objectName')
 		self.paramval = 0
 		self.fetch_param()	# get initial param value and put in text box
